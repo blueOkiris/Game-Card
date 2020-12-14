@@ -4,6 +4,11 @@
 #include <Arduino.h>
 #include "Ssd1306.hpp"
 
+// Some of this is limited for memory reasons
+#define MAP_SIZE        128     // 128/8 * 64/8 = 16 * 8 = 128
+#define MAX_SPRITES     32
+#define MAX_TILES       64
+
 namespace gamecard {
     struct Sprite {
         uint8_t x, y;
@@ -15,9 +20,9 @@ namespace gamecard {
         private:
             Ssd1306 _display;
             
-            Image _tiles[64];
-            uint8_t _bg[128];
-            Sprite _sprs[32];
+            Image _tiles[MAX_TILES];
+            uint8_t _bg[MAP_SIZE];
+            Sprite _sprs[MAX_SPRITES];
         
         public:
             Oled();

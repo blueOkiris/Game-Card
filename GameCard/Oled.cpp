@@ -3,12 +3,14 @@
 using namespace gamecard;
 
 Oled::Oled() : _display(0x78) {
-    for(int i = 0; i < 128; i++) {
-        for(int j = 0; j < 8; j++) {
-            _tiles[i][j];
+    for(int i = 0; i < MAP_SIZE; i++) {
+        if(i < MAX_TILES) {
+            for(int j = 0; j < 8; j++) {
+                _tiles[i][j];
+            }
         }
         _bg[i] = 0;
-        if(i < 64) {
+        if(i < MAX_SPRITES) {
             _sprs[i] = (Sprite) { 0, 0, 0 };
         }
     }
@@ -31,7 +33,7 @@ void Oled::updateMap() {
 }
 
 void Oled::updateSprites() {
-    for(int i = 0; i < 256; i++) {
+    for(int i = 0; i < MAX_SPRITES; i++) {
         uint8_t topLeftX = (_sprs[i].x << 8) >> 8;
         uint8_t topLeftY = (_sprs[i].y << 8) >> 8;
         uint8_t *bgTiles[4] = {
