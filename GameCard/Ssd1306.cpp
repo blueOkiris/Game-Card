@@ -47,7 +47,6 @@ void Ssd1306::_command(uint8_t cmd) {
     Wire.write(SSD_CTRL);
     Wire.write(cmd);
     Wire.endTransmission();
-    yield();
 }
 
 void Ssd1306::setColumn(uint8_t column) {
@@ -145,7 +144,7 @@ void Ssd1306::test() {
         for(int j = 0; j < 128; j++) {
             setColumn(j);
             putCol(0xFF);
-            delay(100);
+            //delay(10);
         }
     }
 }
