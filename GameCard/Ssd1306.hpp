@@ -29,15 +29,30 @@
  * - Default address should be 0x78
  */
 
-#define SSD_CMD_SET_CONTRAST    0x81        // Don't touch
+#define SSD_CMD_SET_CONTRAST    0x81
 #define SSD_CMD_OUTPUT_IS_RAM   0xA4
-#define SSD_CMD_OUTPUT_NOT_RAM  0xA5        // Don't touch
-#define SSD_CMD_DISP_NORMAL     0xA6        // Don't touch
-#define SSD_CMD_DISP_INVERSE    0xA7        // Don't touch
-#define SSD_CMD_DISP_OFF        0xAE        // Don't touch
+#define SSD_CMD_OUTPUT_NOT_RAM  0xA5
+#define SSD_CMD_DISP_NORMAL     0xA6
+#define SSD_CMD_DISP_INVERSE    0xA7
+#define SSD_CMD_DISP_OFF        0xAE
 #define SSD_CMD_DISP_ON         0xAF
+#define SSD_CMD_SET_CLK_DIV     0xD5
+#define SSD_CMD_SET_MULTIPLEX   0xA8
+#define SSD_CMD_SET_DISP_OFFSET 0xD3
+#define SSD_CMD_SET_START_LN    0x40
+#define SSD_CMD_CHARGE_PUMP     0x8D
+#define SSD_CMD_MEMORYMODE      0x20
+#define SSD_CMD_SEGREMAP        0x01
+#define SSD_CMD_COMSCAN_DEC     0xC8
+#define SSD_CMD_SET_COMPINS     0xDA
+#define SSD_CMD_SET_PRECHARGE   0xD9
+#define SSD_CMD_SET_VCOM_DETECT 0xDB
+#define SSD_CMD_SET_COL_ADDR    0x21
+#define SSD_CMD_SET_PAGE_ADDR   0x22
 
-#define SSD_CTRL                0x80
+#define SSD_LCD_WIDTH           128
+#define SSD_LCD_HEIGHT          64
+#define SSD_CTRL                0x00
 #define SSD_DATA                0x40
 
 namespace gamecard {
@@ -47,15 +62,15 @@ namespace gamecard {
             uint8_t _column, _page;
             
             void _command(uint8_t cmd);
-            void _command(uint8_t cmd, uint8_t *data, size_t len);
-            void _putRow(uint8_t row);
         
         public:
-            Ssd1306(const int iicAddr);
+            Ssd1306(const int iicAddr, const int resetPin);
+            void test();
             
             void setColumn(uint8_t column);
             void setPage(uint8_t page);
             
+            void putCol(uint8_t row);
             void putTile(uint8_t *data);
             void putQuadTile(uint8_t *tiles[4]);
             void drawOffsetTile(

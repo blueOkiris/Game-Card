@@ -2,11 +2,11 @@
 
 using namespace gamecard;
 
-Oled::Oled() : _display(0x78) {
+Oled::Oled() : _display(0x3C, 15) {
     for(int i = 0; i < MAP_SIZE; i++) {
         if(i < MAX_TILES) {
             for(int j = 0; j < 8; j++) {
-                _tiles[i][j];
+                _tiles[i][j] = 1;
             }
         }
         _bg[i] = 0;
