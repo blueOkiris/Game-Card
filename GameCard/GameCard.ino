@@ -1,59 +1,77 @@
+#include <avr/pgmspace.h>
 #include "Oled.hpp"
-#include "Ssd1306.hpp"
 
+#define CMD_SIZE    10
+const uint8_t testApp[] PROGMEM = {
+    'T', 1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    'S', 0, 'W', 5, 5, 1, 0, 0, 0, 0,
+    'U', 'S', 0, 0, 0, 0, 0, 0, 0, 0,
+};
 gamecard::Oled oled;
-const uint8_t box[8] = { 0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF };
-const uint8_t box2[8] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-const uint8_t cross[8] = { 0x18, 0x18, 0x7E, 0x7E, 0x18, 0x18, 0x18, 0x18 };
 
 void setup() {
     Serial.begin(9600);
-    
     oled.init();
-    //oled.testDisplay();
-    oled.setTile(1, box);
-    oled.setTile(2, box2);
-    oled.setTile(3, cross);
     
-    for(int i = 0; i < 16; i++) {
-        if(i % 2 == 0) {
-            oled.setBg(i, 0, 1);
-            oled.setBg(i, 7, 1);
-            if(i > 0 && i < 7) {
-                oled.setBg(0, i, 1);
-                oled.setBg(15, i, 1);
-            }
-        } else {
-            oled.setBg(i, 0, 2);
-            oled.setBg(i, 7, 2);
-            if(i > 0 && i < 7) {
-                oled.setBg(0, i, 2);
-                oled.setBg(15, i, 2);
-            }
+    for(int i = 0; i < sizeof(testApp) / CMD_SIZE; i++) {
+        uint8_t cmd[8];
+        for(int j = 0; j < CMD_SIZE; j++) {
+            cmd[j] = pgm_read_byte_near(testApp + i * CMD_SIZE + j);
         }
+        runCommand(cmd);
     }
-    oled.updateMap();
-    oled.setSprite(0, (gamecard::Sprite) { 0, 0, 3 });
-    
-    /*for(int j = 0; j < 16; j++) {
-        for(int i = 0; i < 16; i++) {
-            oled.setSprite(0, (gamecard::Sprite) { i, j, 3 });
-            oled.updateSprites();
-            delay(500);
-        }
-    }*/
 }
 
 void loop() {
-    auto spr = oled.getSprite(0);
-    spr.x += 2;
-    if(spr.x > 119) {
-        spr.x = 0;
-        spr.y += 2;
+}
+
+void runCommand(uint8_t command[CMD_SIZE]) {
+    Serial.print(F("Running command: { "));
+    for(int i = 0; i < CMD_SIZE; i++) {
+        Serial.print(command[i]);
+        Serial.print(F(" "));
     }
-    if(spr.y > 55) {
-        spr.y = 0;
+    Serial.println(F(" }"));
+    switch(command[0]) {
+        case 'S':                       // Sprite
+            // 0 is S
+            // 1 is the index
+            // 2-rest is the data
+            switch(command[2]) {
+                case 'W':               // Entire
+                    oled.setSprite(
+                        command[1], { command[3], command[4], command[5] }
+                    );
+                    break;
+                case 'X':               // X
+                    break;
+                case 'Y':               // Y
+                    break;
+                case 'I':               // tile index
+                    break;
+            }
+            break;
+            
+        case 'T':                       // Tile
+            // 0 is T
+            // 1 is index
+            // 2-rest is data
+            oled.setTile(command[1], ((uint8_t *) command) + 2);
+            break;
+            
+        case 'U':                       // Update
+            switch(command[1]) {
+                case 'A':               // Update sprites and map
+                    oled.updateSprites();
+                    oled.updateMap();
+                    break;
+                case 'S':               // Update Sprites
+                    oled.updateSprites();
+                    break;
+                case 'M':               // Update map
+                    oled.updateMap();
+                    break;
+            }
+            break;
     }
-    oled.setSprite(0, spr);
-    oled.updateSprites();
 }

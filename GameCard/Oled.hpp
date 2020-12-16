@@ -18,7 +18,7 @@ namespace gamecard {
     
     struct Oled {
         private:
-            const Ssd1306 _display = Ssd1306();
+            const Ssd1306 _display PROGMEM = Ssd1306();
         
             Image _tiles[MAX_TILES];
             uint8_t _bg[MAP_SIZE];
