@@ -54,15 +54,16 @@
 #define SSD_SCREEN_HEIGHT       64
 #define SSD_CTRL                0x00
 #define SSD_DATA                0x40
+#define SSD_I2C_ADDR            0x3C
+#define SSD_RESET               15
 
 namespace gamecard {
     class Ssd1306 {
         private:
-            const int _iicAddr;
             void _command(uint8_t cmd) const;
         
         public:
-            Ssd1306(const int iicAddr, const int resetPin);
+            void init() const;
             void test() const;
             
             void clear() const;

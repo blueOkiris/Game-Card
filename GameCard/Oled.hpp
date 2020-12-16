@@ -18,14 +18,16 @@ namespace gamecard {
     
     struct Oled {
         private:
-            Ssd1306 _display;
-            
+            const Ssd1306 _display = Ssd1306();
+        
             Image _tiles[MAX_TILES];
             uint8_t _bg[MAP_SIZE];
             Sprite _sprs[MAX_SPRITES];
         
         public:
-            Oled();
+            void init();
+            void testDisplay();
+            
             void updateMap();
             void updateSprites();
     };

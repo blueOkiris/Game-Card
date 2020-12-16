@@ -4,17 +4,17 @@
 
 using namespace gamecard;
 
-Ssd1306::Ssd1306(const int iicAddr, const int resetPin) : _iicAddr(iicAddr) {
+void Ssd1306::init() const {
     Wire.begin();
     Wire.setClock(1000000);
     
     // Reset?
-    pinMode(resetPin, OUTPUT);
-    digitalWrite(resetPin, HIGH);
+    pinMode(SSD_RESET, OUTPUT);
+    digitalWrite(SSD_RESET, HIGH);
     delay(1);
-    digitalWrite(resetPin, LOW);
+    digitalWrite(SSD_RESET, LOW);
     delay(10);
-    digitalWrite(resetPin, HIGH);
+    digitalWrite(SSD_RESET, HIGH);
     
     _command(SSD_CMD_DISP_OFF);             // command 
     _command(SSD_CMD_SET_CLK_DIV);          // command
@@ -45,14 +45,14 @@ Ssd1306::Ssd1306(const int iicAddr, const int resetPin) : _iicAddr(iicAddr) {
 }
 
 void Ssd1306::_command(uint8_t cmd) const {
-    Wire.beginTransmission(_iicAddr);
+    Wire.beginTransmission(SSD_I2C_ADDR);
     Wire.write(SSD_CTRL);
     Wire.write(cmd);
     Wire.endTransmission();
 }
 
 void Ssd1306::clear() const {
-    Wire.beginTransmission(_iicAddr);
+    Wire.beginTransmission(SSD_I2C_ADDR);
     
     Wire.write(SSD_CTRL);
     Wire.write(SSD_CMD_SET_PAGE_ADDR);
@@ -64,20 +64,20 @@ void Ssd1306::clear() const {
     Wire.write(0);
     Wire.write(SSD_SCREEN_WIDTH - 1);
     
-    Wire.endTransmission(_iicAddr);
+    Wire.endTransmission(SSD_I2C_ADDR);
     
     for(int i = 0; i < 1024; i++) {
-        Wire.beginTransmission(_iicAddr);
+        Wire.beginTransmission(SSD_I2C_ADDR);
         Wire.write(SSD_DATA);
         Wire.write(0x00);
-        Wire.endTransmission(_iicAddr);
+        Wire.endTransmission(SSD_I2C_ADDR);
     }
 }
 
 // Note that tiles are column bytes, not row bytes!
 // If your tile was V, then it would draw >
 void Ssd1306::putTile(uint8_t data[8], uint8_t tileX, uint8_t tileY) const {
-    Wire.beginTransmission(_iicAddr);
+    Wire.beginTransmission(SSD_I2C_ADDR);
     
     Wire.write(SSD_CTRL);
     Wire.write(SSD_CMD_SET_PAGE_ADDR);
@@ -92,16 +92,16 @@ void Ssd1306::putTile(uint8_t data[8], uint8_t tileX, uint8_t tileY) const {
     Wire.endTransmission();
     
     for(int i = 7; i >= 0; i--) {
-        Wire.beginTransmission(_iicAddr);
+        Wire.beginTransmission(SSD_I2C_ADDR);
         Wire.write(SSD_DATA);
         Wire.write(data[i]);
-        Wire.endTransmission(_iicAddr);
+        Wire.endTransmission(SSD_I2C_ADDR);
     }
 }
 
 void Ssd1306::putQuadTile(
         uint8_t tiles[4][8], uint8_t topLeftX, uint8_t topLeftY) const {
-    Wire.beginTransmission(_iicAddr);
+    Wire.beginTransmission(SSD_I2C_ADDR);
     
     Wire.write(SSD_CTRL);
     Wire.write(SSD_CMD_SET_PAGE_ADDR);
@@ -117,10 +117,10 @@ void Ssd1306::putQuadTile(
     
     for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 8; j++) {
-            Wire.beginTransmission(_iicAddr);
+            Wire.beginTransmission(SSD_I2C_ADDR);
             Wire.write(SSD_DATA);
             Wire.write(tiles[i][j]);
-            Wire.endTransmission(_iicAddr);
+            Wire.endTransmission(SSD_I2C_ADDR);
         }
     }
 }
@@ -174,7 +174,7 @@ void Ssd1306::test() const {
     for(int i = 0; i < 4; i++) {
         clear();
         
-        Wire.beginTransmission(_iicAddr);
+        Wire.beginTransmission(SSD_I2C_ADDR);
         
         Wire.write(SSD_CTRL);
         Wire.write(SSD_CMD_SET_COL_ADDR);
@@ -186,16 +186,16 @@ void Ssd1306::test() const {
         Wire.write(0);
         Wire.write(SSD_SCREEN_HEIGHT / 8 - 1);
         
-        Wire.endTransmission(_iicAddr);
+        Wire.endTransmission(SSD_I2C_ADDR);
         
-        for(int i = 0; i < 1024; i++) {
-            Wire.beginTransmission(_iicAddr);
+        for(int j = 0; j < 1024; j++) {
+            Wire.beginTransmission(SSD_I2C_ADDR);
             Wire.write(SSD_DATA);
             Wire.write(0xFF);
-            Wire.endTransmission(_iicAddr);
+            Wire.endTransmission(SSD_I2C_ADDR);
         }
     }
-    delay(100);
+    delay(1000);
     
     // Draw a tile
     clear();
@@ -253,13 +253,17 @@ void Ssd1306::test() const {
     putQuadTile(quadTiles, 2, 2);
     drawOffsetTile(69, 2, sprite, quadTiles);
     
-    delay(100);
+    delay(1000);
     
     // Fill a background
     clear();
     for(int i = 0; i < 16; i++) {
         for(int j = 0; j < 8; j++) {
             putTile(sprite, i, j);
+            delay(100);
         }
     }
+    
+    delay(1000);
+    clear();
 }
