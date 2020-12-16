@@ -130,7 +130,7 @@ void Ssd1306::drawOffsetTile(
     uint8_t topLeftX = x >> 3;
     uint8_t topLeftY = (y >> 3) << 3;
     
-    uint8_t offX = x - (topLeftX << 3);
+    uint8_t offX = 7 - (x - (topLeftX << 3));
     uint8_t offY = y - topLeftY;
     
     uint8_t quadTile[4][8];
