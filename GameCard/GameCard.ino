@@ -13,10 +13,14 @@ void setup() {
 
 void loop() {
     gamecard::Sprite testSprite = oled.getSprite(0);
-    testSprite.x += 1;
+    testSprite.x++;
     if(testSprite.x > 120) {
         testSprite.x = 0;
+        testSprite.y++;
+    }
+    if(testSprite.y > 56) {
+        testSprite.y = 0;
     }
     oled.setSprite(0, testSprite);
-    delay(100);
+    delay(10);
 }
