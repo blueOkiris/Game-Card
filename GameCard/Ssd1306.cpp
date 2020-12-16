@@ -195,6 +195,7 @@ void Ssd1306::test() const {
             Wire.endTransmission(_iicAddr);
         }
     }
+    delay(100);
     
     // Draw a tile
     clear();
@@ -251,4 +252,14 @@ void Ssd1306::test() const {
     putTile(sprite, 1, 1);
     putQuadTile(quadTiles, 2, 2);
     drawOffsetTile(69, 2, sprite, quadTiles);
+    
+    delay(100);
+    
+    // Fill a background
+    clear();
+    for(int i = 0; i < 16; i++) {
+        for(int j = 0; j < 8; j++) {
+            putTile(sprite, i, j);
+        }
+    }
 }
