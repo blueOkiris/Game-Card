@@ -20,22 +20,17 @@ namespace gamecard {
         private:
             const Ssd1306 _display PROGMEM = Ssd1306();
         
-            Image _tiles[MAX_TILES];
-            uint8_t _bg[MAP_SIZE];
-            Sprite _sprs[MAX_SPRITES];
-        
         public:
+            Image tiles[MAX_TILES];
+            uint8_t bg[MAP_SIZE];
+            Sprite sprs[MAX_SPRITES];
+            
             void init();
             void testDisplay();
-            
-            void updateMap();
+            void copyTile(uint8_t index, uint8_t data[8]);
+            void clearSprite(uint8_t index);
             void updateSprites();
-            
-            Sprite getSprite(uint8_t index);
-            void setSprite(uint8_t index, Sprite data);
-            uint8_t getBg(uint8_t x, uint8_t y);
-            void setBg(uint8_t x, uint8_t y, uint8_t index);
-            void setTile(uint8_t index, uint8_t data[8]);
+            void updateMap();
     };
 }
 
