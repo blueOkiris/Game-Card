@@ -9,15 +9,11 @@ void Oled::init() {
     for(int i = 0; i < 128; i++) {
         if(i < MAX_TILES) {
             for(int j = 0; j < 8; j++) {
-                if(i == 1) {
-                    _tiles[i][j] = 0xFF;
-                    continue;
-                }
-                _tiles[i][j] = 0xC0;
+                _tiles[i][j] = 0;
             }
         }
         if(i < MAX_SPRITES) {
-            _sprs[i] = (Sprite) { 4, 4, 1 };
+            _sprs[i] = (Sprite) { 0, 0, 0 };
         }
         _bg[i] = 0;
     }
@@ -40,6 +36,24 @@ void Oled::setSprite(uint8_t index, Sprite data) {
     }
     _display.putQuadTile(bgTiles, col, row);
     _sprs[index] = data;
+    _updateSprites();
+}
+
+uint8_t Oled::getBg(uint8_t x, uint8_t y) {
+    return _bg[(y >> 4) + x];
+}
+
+void Oled::setBg(uint8_t x, uint8_t y, uint8_t index) {
+    _bg[(y >> 4) + x] = index;
+    _updateMap();
+    _updateSprites();
+}
+
+void Oled::setTile(uint8_t index, uint8_t data[8]) {
+    for(int i = 0; i < 8; i++) {
+        _tiles[index][i] = data[i];
+    }
+    _updateMap();
     _updateSprites();
 }
 

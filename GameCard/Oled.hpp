@@ -33,6 +33,9 @@ namespace gamecard {
             
             Sprite getSprite(uint8_t index);
             void setSprite(uint8_t index, Sprite data);
+            uint8_t getBg(uint8_t x, uint8_t y);
+            void setBg(uint8_t x, uint8_t y, uint8_t index);
+            void setTile(uint8_t index, uint8_t data[8]);
     };
 }
 
