@@ -99,38 +99,12 @@ void Ssd1306::putTile(uint8_t data[8], uint8_t tileX, uint8_t tileY) const {
     }
 }
 
-void Ssd1306::putQuadTile(
-        uint8_t tiles[4][8], uint8_t topLeftX, uint8_t topLeftY) const {
-    Wire.beginTransmission(SSD_I2C_ADDR);
-    
-    Wire.write(SSD_CTRL);
-    Wire.write(SSD_CMD_SET_PAGE_ADDR);
-    Wire.write(topLeftY);
-    Wire.write(topLeftY + 2);
-    
-    Wire.write(SSD_CTRL);
-    Wire.write(SSD_CMD_SET_COL_ADDR);
-    Wire.write(112 - (topLeftX << 3));
-    Wire.write(127 - (topLeftX << 3));
-    
-    Wire.endTransmission();
-    
-    for(int i = 0; i < 4; i++) {
-        for(int j = 0; j < 8; j++) {
-            Wire.beginTransmission(SSD_I2C_ADDR);
-            Wire.write(SSD_DATA);
-            Wire.write(tiles[i][j]);
-            Wire.endTransmission(SSD_I2C_ADDR);
-        }
-    }
-}
-
 void Ssd1306::drawOffsetTile(
         uint8_t x, uint8_t y, uint8_t data[8], uint8_t bgTiles[4][8]) const {
     uint8_t topLeftX = x >> 3;
     uint8_t topLeftY = (y >> 3) << 3;
     
-    uint8_t offX = 7 - (x - (topLeftX << 3));
+    uint8_t offX = x - (topLeftX << 3);
     uint8_t offY = y - topLeftY;
     
     uint8_t quadTile[4][8];
@@ -166,7 +140,10 @@ void Ssd1306::drawOffsetTile(
         }
     }
     
-    putQuadTile(quadTile, topLeftX, topLeftY);
+    putTile(quadTile[0], topLeftX, topLeftY >> 3);
+    putTile(quadTile[1], topLeftX + 1, topLeftY >> 3);
+    putTile(quadTile[2], topLeftX, (topLeftY >> 3) + 1);
+    putTile(quadTile[3], topLeftX + 1, (topLeftY >> 3) + 1);
 }
 
 void Ssd1306::test() const {
@@ -250,8 +227,7 @@ void Ssd1306::test() const {
     };
     
     putTile(sprite, 1, 1);
-    putQuadTile(quadTiles, 2, 2);
-    drawOffsetTile(69, 2, sprite, quadTiles);
+    drawOffsetTile(69, 35, sprite, quadTiles);
     
     delay(1000);
     
@@ -260,7 +236,7 @@ void Ssd1306::test() const {
     for(int i = 0; i < 16; i++) {
         for(int j = 0; j < 8; j++) {
             putTile(sprite, i, j);
-            delay(100);
+            delay(10);
         }
     }
     

@@ -6,7 +6,7 @@
 
 // Some of this is limited for memory reasons
 #define MAP_SIZE        128     // 128/8 * 64/8 = 16 * 8 = 128
-#define MAX_SPRITES     1
+#define MAX_SPRITES     32
 #define MAX_TILES       64
 
 namespace gamecard {
@@ -23,13 +23,13 @@ namespace gamecard {
             Image _tiles[MAX_TILES];
             uint8_t _bg[MAP_SIZE];
             Sprite _sprs[MAX_SPRITES];
-            
-            void _updateMap();
-            void _updateSprites();
         
         public:
             void init();
             void testDisplay();
+            
+            void updateMap();
+            void updateSprites();
             
             Sprite getSprite(uint8_t index);
             void setSprite(uint8_t index, Sprite data);
