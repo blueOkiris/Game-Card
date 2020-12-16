@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include "Ssd1306.hpp"
+#include "Device.hpp"
 
 using namespace gamecard;
 
@@ -243,3 +243,138 @@ void Ssd1306::test() const {
     delay(1000);
     clear();
 }
+
+void VirtualMachine::init() {
+    _display.init();
+    _display.clear();
+    
+    for(int i = 0; i < VM_MAP_SIZE; i++) {
+        if(i < VM_MAX_TILES) {
+            for(int j = 0; j < 8; j++) {
+                _tiles[i][j] = 0;
+            }
+        }
+        if(i < VM_MAX_SPRITES) {
+            _sprs[i] = (Sprite) { 0, 0, 0 };
+        }
+        _bg[i] = 0;
+    }
+    pc = 0;
+}
+
+void VirtualMachine::_clearSprite(uint8_t index) {
+    uint8_t row = _sprs[index].y >> 3;
+    uint8_t col = _sprs[index].x >> 3;
+    _display.putTile(_tiles[_bg[(row << 4) + col]], col, row);
+    _display.putTile(_tiles[_bg[(row << 4) + col + 1]], col + 1, row);
+    _display.putTile(_tiles[_bg[((row + 1) << 4) + col]], col, row + 1);
+    _display.putTile(_tiles[_bg[((row + 1) << 4) + col + 1]], col + 1, row + 1);
+}
+
+void VirtualMachine::_copyTile(uint8_t index, uint8_t data[8]) {
+    for(int i = 0; i < 8; i++) {
+        _tiles[index][i] = data[i];
+    }
+}
+
+void VirtualMachine::testDisplay() {
+    _display.test();
+}
+
+void VirtualMachine::_updateMap() {
+    for(int row = 0; row < 8; row++) {
+        for(int col = 0; col < 16; col++) {
+            _display.putTile(_tiles[_bg[(row << 4) + col]], col, row);
+        }
+    }
+}
+
+void VirtualMachine::_updateSprites() {
+    for(int i = 0; i < VM_MAX_SPRITES; i++) {
+        if(_sprs[i].image != 0) {
+            uint8_t row = _sprs[i].y >> 3;
+            uint8_t col = _sprs[i].x >> 3;
+            
+            uint8_t bgTiles[4][8];
+            for(int j = 0; j < 8; j++) {
+                bgTiles[0][j] = _tiles[_bg[(row << 4) + col]][j];
+                bgTiles[1][j] = _tiles[_bg[(row << 4) + col + 1]][j];
+                bgTiles[2][j] = _tiles[_bg[((row + 1) << 4) + col]][j];
+                bgTiles[3][j] = _tiles[_bg[((row + 1) << 4) + col + 1]][j];
+            }
+            _display.drawOffsetTile(
+                _sprs[i].x, _sprs[i].y, _tiles[_sprs[i].image], bgTiles
+            );
+        }
+    }
+}
+
+void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
+    switch(command[0]) {
+        case 'S':                       // Sprite
+            _clearSprite(command[1]);
+            // 0 is S
+            // 1 is the index
+            // 2-rest is the data
+            switch(command[2]) {
+                case 'W':               // Entire
+                    _sprs[command[1]] = {
+                        command[3], command[4], command[5]
+                    };
+                    break;
+                case 'X':               // X
+                    switch(command[3]) {
+                        case 'R':       // Relative
+                            _sprs[command[1]].x += command[4];
+                            break;
+                        case 'S':       // Set
+                            _sprs[command[1]].x = command[4];
+                            break;
+                    }
+                    break;
+                case 'Y':               // Y
+                    switch(command[3]) {
+                        case 'R':       // Relative
+                            _sprs[command[1]].y += command[4];
+                            break;
+                        case 'S':       // Set
+                            _sprs[command[1]].y = command[4];
+                            break;
+                    }
+                    break;
+                case 'I':               // Image
+                    _sprs[command[1]].image = command[3];
+                    break;
+            }
+            break;
+            
+        case 'T':                       // Tile
+            // 0 is T
+            // 1 is index
+            // 2-rest is data
+            _copyTile(command[1], ((uint8_t *) command) + 2);
+            break;
+        
+        case 'B':                       // Background
+            _bg[command[1]] = command[2];
+            break;
+        
+        case 'U':                       // Update
+            switch(command[1]) {
+                case 'A':               // Update sprites and map
+                    _updateSprites();
+                    _updateMap();
+                    break;
+                case 'S':               // Update Sprites
+                    _updateSprites();
+                    break;
+                case 'M':               // Update map
+                    _updateMap();
+                    break;
+            }
+            break;
+    }
+    
+    pc++;
+}
+

@@ -1,34 +1,7 @@
-#ifndef _SSD1306_HPP_
-#define _SSD1306_HPP_
+#ifndef _DEVICE_HPP_
+#define _DEVICE_HPP_
 
-#include <Arduino.h>
-
-/*
- * This is a wrapper for communication with the SSD1306 driver chip
- * It is controlled by sending data over I2C
- * 
- * Note that clock and data require pullups and the device can be 0-16V
- * 
- * The basic properties of the device are as follows:
- * - 128x64 pixels, but ALSO the size of data ram (in bits)
- * - Data ram is further divied into 8 pages
- * - Each pixels is thus, a bit, and each page is 8 pixel rows
- * - Drawing a tile would be:
- *     + setting a tile page 
- *     + offsetting by start x
- *     + drawing a byte (watch for over)
- *     + offsetting by 128/8 = 16 bytes
- *     + drawing a byte (watch for over)
- *     + and repeating those last two over and over again
- * - Drawing a sprite would be:
- *     + Getting page of top-left tile
- *     + draw top left through top right tiles (watch for over)
- *     + adding 16 bytes and repeating through the page
- *     + increasing the page and repeating
- *     + Draw the sprite (most inefficient part)
- * - Default address should be 0x78
- */
-
+// Oled driver commands
 #define SSD_CMD_SET_CONTRAST    0x81
 #define SSD_CMD_OUTPUT_IS_RAM   0xA4
 #define SSD_CMD_OUTPUT_NOT_RAM  0xA5
@@ -57,6 +30,12 @@
 #define SSD_I2C_ADDR            0x3C
 #define SSD_RESET               15
 
+// Some of this is limited for memory reasons
+#define VM_MAP_SIZE             128     // 128/8 * 64/8 = 16 * 8 = 128
+#define VM_MAX_SPRITES          32
+#define VM_MAX_TILES            64
+#define VM_CMD_LEN              10
+
 namespace gamecard {
     class Ssd1306 {
         private:
@@ -75,7 +54,33 @@ namespace gamecard {
                 uint8_t x, uint8_t y, uint8_t data[8], uint8_t bgTiles[4][8]
             ) const;
     };
-}
 
+    struct Sprite {
+        uint8_t x, y;
+        uint8_t image;
+    };
+    
+    typedef uint8_t Image[8];
+
+    class VirtualMachine {
+        private:
+            const Ssd1306 _display PROGMEM = Ssd1306();
+            Image _tiles[VM_MAX_TILES];
+            uint8_t _bg[VM_MAP_SIZE];
+            Sprite _sprs[VM_MAX_SPRITES];
+            
+            void _copyTile(uint8_t index, uint8_t data[8]);
+            void _clearSprite(uint8_t index);
+            void _updateSprites();
+            void _updateMap();
+        
+        public:
+            uint32_t pc;
+            
+            void init();
+            void execute(uint8_t command[VM_CMD_LEN]);
+            void testDisplay();
+    };
+}
 
 #endif
