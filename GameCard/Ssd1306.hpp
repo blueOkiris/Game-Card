@@ -50,8 +50,8 @@
 #define SSD_CMD_SET_COL_ADDR    0x21
 #define SSD_CMD_SET_PAGE_ADDR   0x22
 
-#define SSD_LCD_WIDTH           128
-#define SSD_LCD_HEIGHT          64
+#define SSD_SCREEN_WIDTH        128
+#define SSD_SCREEN_HEIGHT       64
 #define SSD_CTRL                0x00
 #define SSD_DATA                0x40
 
@@ -59,23 +59,20 @@ namespace gamecard {
     class Ssd1306 {
         private:
             const int _iicAddr;
-            uint8_t _column, _page;
-            
-            void _command(uint8_t cmd);
+            void _command(uint8_t cmd) const;
         
         public:
             Ssd1306(const int iicAddr, const int resetPin);
-            void test();
+            void test() const;
             
-            void setColumn(uint8_t column);
-            void setPage(uint8_t page);
-            
-            void putCol(uint8_t row);
-            void putTile(uint8_t *data);
-            void putQuadTile(uint8_t *tiles[4]);
+            void clear() const;
+            void putTile(uint8_t data[8], uint8_t tileX, uint8_t tileY) const;
+            void putQuadTile(
+                uint8_t tiles[4][8], uint8_t topLeftX, uint8_t topLeftY
+            ) const;
             void drawOffsetTile(
-                uint8_t x, uint8_t y, uint8_t *data, uint8_t *bgTiles[4]
-            );
+                uint8_t x, uint8_t y, uint8_t data[8], uint8_t bgTiles[4][8]
+            ) const;
     };
 }
 
