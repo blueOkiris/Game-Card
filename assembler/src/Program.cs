@@ -6,8 +6,11 @@ namespace assembler {
         static void Main(string[] args) {
             var tokens = Lexer.Tokens(File.ReadAllText("docs/example.gca"));
             foreach(var token in tokens) {
-                Console.WriteLine(token);
+                //Console.WriteLine(token);
             }
+            
+            var ast = Parser.BuildProgram(tokens);
+            //Console.WriteLine(ast);
         }
     }
 }

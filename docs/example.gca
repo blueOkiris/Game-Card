@@ -9,10 +9,10 @@ set_bg:
     bgi     reg0, 2
     add     reg0, 1
     cmp     reg0, reg1
-    jg      sprites
+    jg      init_spr
     jmp     set_bg
     
-sprites:
+init_spr:
     spr     0, 5, 5, 1
     upd     sprites
 
