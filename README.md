@@ -16,4 +16,8 @@ Code for the business-card sized game console, the Game Card
 
 ## Programming Games
 
+ROMs are programmed in hex and loaded onto cartridges which contain SPI controlled EEPROMs in the 25LC1024-I/P family. These devices are filled up with instructions with arguments of total size 10 bytes each which cause the Vritual machine to draw graphics, change memory, change the program counter, etc.
+
+As of right now, you must manually enter the bytes using a hexeditor, however an asssembly language and assembler will be created eventually
+
 See the instruction set for ROMs in the [instruction set document](./docs/instr.md)
