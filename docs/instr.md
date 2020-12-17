@@ -46,7 +46,12 @@ You can set them witht the sprite set command and draw them on the screen with t
 
 ## Instructions
 
-Note that every instruction is composed of 10 bytes. If the command doesn't fill all 10 bytes, it must be padded with 0s
+Some things to take note of:
+
+1) that every instruction is composed of 10 bytes. If the command doesn't fill all 10 bytes, it must be padded with 0s
+
+2) Any where 'R' is used to mean relative, one can use 'R' for +=, 'N' for += - or -=, 'P' for *=, 'Q' for /=, '>' for >>=, and '<' for <<=
+  Sorry for this to be a bit out of place. It was written after the relatives, *and* it would be quite a bit to add to each place a relative goes. Just keep it in mind!
 
 __Sprite Set__
 
@@ -169,9 +174,3 @@ Here's two instructions to show the combination of jump with the compare instruc
 }
 ```
 Jumps to instruction 20+1 = 21 if the compare register is equal to zero, i.e. if reg 0 >= reg 1
-
-__Planned Instructions__
-- Multiply
-- Divide
-- Left/Right Shift
-- 

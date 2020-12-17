@@ -390,6 +390,21 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
                         case 'R':       // Relative
                             _sprs[index].x += values[0];
                             break;
+                        case 'N':       // Relative to negative
+                            _sprs[index].x -= values[0];
+                            break;
+                        case 'P':       // Relative to product
+                            _sprs[index].x *= values[0];
+                            break;
+                        case 'Q':       // Relative to quotient
+                            _sprs[index].x /= values[0];
+                            break;
+                        case '>':
+                            _sprs[index].x >>= values[0];
+                            break;
+                        case '<':
+                            _sprs[index].x <<= values[0];
+                            break;
                         case 'S':       // Set
                             _sprs[index].x = values[0];
                             break;
@@ -410,6 +425,21 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
                             break;
                         case 'S':       // Set
                             _sprs[index].y = values[0];
+                            break;
+                        case 'N':       // Relative to negative
+                            _sprs[index].y -= values[0];
+                            break;
+                        case 'P':       // Relative to product
+                            _sprs[index].y *= values[0];
+                            break;
+                        case 'Q':       // Relative to quotient
+                            _sprs[index].y /= values[0];
+                            break;
+                        case '>':
+                            _sprs[index].y >>= values[0];
+                            break;
+                        case '<':
+                            _sprs[index].y <<= values[0];
                             break;
                     }
                     break;
@@ -485,6 +515,21 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
                         case 'R':
                             _regs[command[1]] += data;
                             break;
+                        case 'N':       // Relative to negative
+                            _regs[command[1]] -= data;
+                            break;
+                        case 'P':       // Relative to product
+                            _regs[command[1]] *= data;
+                            break;
+                        case 'Q':       // Relative to quotient
+                            _regs[command[1]] /= data;
+                            break;
+                        case '>':
+                            _regs[command[1]] >>= data;
+                            break;
+                        case '<':
+                            _regs[command[1]] <<= data;
+                            break;
                     }
                     break;
                 case 'R':
@@ -495,6 +540,21 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
                             break;
                         case 'R':
                             _regs[command[1]] += data;
+                            break;
+                        case 'N':       // Relative to negative
+                            _regs[command[1]] -= data;
+                            break;
+                        case 'P':       // Relative to product
+                            _regs[command[1]] *= data;
+                            break;
+                        case 'Q':       // Relative to quotient
+                            _regs[command[1]] /= data;
+                            break;
+                        case '>':
+                            _regs[command[1]] >>= data;
+                            break;
+                        case '<':
+                            _regs[command[1]] <<= data;
                             break;
                     }
                     break;
