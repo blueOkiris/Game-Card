@@ -1,5 +1,13 @@
 # Instruction Set Description
 
+## ROM Layout
+
+It's pretty simple.
+
+First, there's a line of 10 bytes, the last 8 of which form a number indicating the number of instructions on the rom
+
+Afterwards, it's the 10-byte instructions
+
 ## Memory Layout
 
 The first thing to understand before programming is the sections of memory that exist. Specifically, there are four.

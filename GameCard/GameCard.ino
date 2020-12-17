@@ -1,7 +1,8 @@
 #include <avr/pgmspace.h>
 #include "Device.hpp"
+#include "Rom.hpp"
 
-const uint8_t testApp[] PROGMEM = {
+/*const uint8_t testApp[] PROGMEM = {
     'T', 1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     'T', 2, 0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF,
     
@@ -25,22 +26,35 @@ const uint8_t testApp[] PROGMEM = {
     'U', 'S', 0, 0, 0, 0, 0, 0, 0, 0,
     'R', 0, 'L', 0, 0, 0, 1, 'R', 0, 0,
     'J', 'J', 0, 0, 0, 0, 0, 0, 0, 13,
-};
+};*/
+
 gamecard::VirtualMachine vm;
+const gamecard::Eeprom25LC1024 rom;
+uint64_t programSize;
 
 void setup() {
     Serial.begin(9600);
     vm.init();
+    rom.init();
+    
+    uint8_t sizeArr[VM_CMD_LEN];
+    vm.pc++;
+    rom.instruction(0, &sizeArr);
+    programSize =
+        (sizeArr[2] << 56) + (sizeArr[3] << 48) + (sizeArr[4] << 40)
+        + (sizeArr[5] << 32) + (sizeArr[6] << 24) + (sizeArr[7] << 16)
+        + (sizeArr[8] << 8) + sizeArr[9];
 }
 
 void loop() {
-    uint8_t cmd[8];
-    for(int j = 0; j < VM_CMD_LEN; j++) {
+    uint8_t cmd[VM_CMD_LEN];
+    /*for(int j = 0; j < VM_CMD_LEN; j++) {
         cmd[j] = pgm_read_byte_near(testApp + vm.pc * VM_CMD_LEN + j);
     }
-    
+    */
+    rom.instruction(vm.pc, &cmd);
     vm.execute(cmd);
     
-    while(vm.pc >= sizeof(testApp) / VM_CMD_LEN);
+    while(vm.pc >= programSize);
 }
 
