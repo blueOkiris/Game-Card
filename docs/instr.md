@@ -10,6 +10,8 @@ There are 32 registers available for general purpose.
 
 These can be set, add or subtracted from, and used in various calculations
 
+Although sprites and tiles use unsigned 8-bit integers for positions and things, these registers are actually 32-bit signed integers. When using a register in a sprite slot, it will cut off the lowest byte of a register and treat it as an unsigned 8-bit integer. 0xFFFFFFEE, a negative number, becomes 0xEE, a positive number.
+
 __Compare Register__
 
 The compare register simply stores the result of a comparison. You cannot directly set it or use it, but it is used by various instructions.
@@ -167,3 +169,9 @@ Here's two instructions to show the combination of jump with the compare instruc
 }
 ```
 Jumps to instruction 20+1 = 21 if the compare register is equal to zero, i.e. if reg 0 >= reg 1
+
+__Planned Instructions__
+- Multiply
+- Divide
+- Left/Right Shift
+- 
