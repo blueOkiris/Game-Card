@@ -5,11 +5,11 @@ PORT :=   /dev/ttyACM0
 ASC :=    arduino
 
 # Build options for Rom Writer C# project
-WR_OBJNAME :=    rom-writer
-WR_PROJNAME :=   rom-writer
-WR_FRAMEWORK :=  net5.0
-WR_RUNTIME :=    linux-x64
-WR_SRC :=        $(wildcard rom-writer/src/*.cs)
+WR_OBJNAME :=   rom-writer
+WR_PROJNAME :=  rom-writer
+WR_FRAMEWORK := net5.0
+WR_RUNTIME :=   linux-x64
+WR_SRC :=       $(wildcard rom-writer/src/*.cs)
 
 # Build options for Rom Writer arduino code
 WR_SKETCH := RomWriter
@@ -22,9 +22,27 @@ CPPFILES :=    $(wildcard $(SKETCH)/*.cpp)
 WR_HPPFILES := $(wildcard rom-writer/$(WR_SKETCH)/*.hpp)
 WR_CPPFILES := $(wildcard rom-writer/$(WR_SKETCH)/*.cpp)
 
+# Build options for assembler aC# project
+AS_OBJNAME :=   assembler
+AS_PROJNAME :=  assembler
+AS_FRAMEWORK := net5.0
+AS_RUNTIME :=   linux-x64
+AS_SRC :=       $(wildcard assembler/src/*.cs)
+
 # Helper targets
 .PHONY : all
 all : $(WR_OBJNAME) upload
+
+.PHONY : clean
+clean :
+	rm -rf rom-writer/bin
+	rm -rf rom-writer/obj
+	rm -rf $(WR_OBJNAME)-$(WR_RUNTIME)
+	rm -rf libSystem.IO.Ports.Native.so
+	rm -rf assembler/bin
+	rm -rf assembler/obj
+	rm -rf $(AS_OBJNAME)-$(AS_RUNTIME)
+	rm -rf /var/tmp/.net
 
 .PHONY : list
 list :
@@ -54,10 +72,8 @@ $(WR_OBJNAME)-$(WR_RUNTIME) : $(WR_SRC)
 	cp rom-writer/bin/Debug/$(WR_FRAMEWORK)/$(WR_RUNTIME)/publish/libSystem.IO.Ports.Native.so ./
 	chmod +x $(WR_OBJNAME)
 
-.PHONY : clean
-clean :
-	rm -rf rom-writer/bin
-	rm -rf rom-writer/obj
-	rm -rf $(WR_OBJNAME)-$(WR_RUNTIME)
-	rm -rf /var/tmp/.net
-	rm -rf libSystem.IO.Ports.Native.so
+# Assembler target
+$(AS_OBJNAME)-$(AS_RUNTIME) : $(AS_SRC)
+	dotnet publish assembler/$(AS_PROJNAME).csproj -r $(AS_RUNTIME) -p:PublishSingleFile=true
+	cp assembler/bin/Debug/$(WR_FRAMEWORK)/$(AS_RUNTIME)/publish/$(AS_PROJNAME) ./$(AS_OBJNAME)-$(AS_RUNTIME)
+	chmod +x $(AS_OBJNAME)

@@ -14,9 +14,15 @@ Code for the business-card sized game console, the Game Card
 
 4. If your port is `/dev/ttyACM0`, then simply run `make`. Otherwise run `PORT=<your port here> make`
 
-## Programming Games
+## Making Games
 
-ROMs are programmed in hex and loaded onto cartridges which contain SPI controlled EEPROMs in the 25LC1024-I/P family. These devices are filled up with instructions with arguments of total size 10 bytes each which cause the Vritual machine to draw graphics, change memory, change the program counter, etc.
+Games are created in the custom assembly language which will be documented at a later date.
+
+These are assembled into hex files using the assembler (build with `make assembler-linux-x64`). These hex files contain instructions which can be written to by the rom-writer (see next section).
+
+## Programming ROMs
+
+ROMs are written in hex and loaded onto cartridges which contain SPI controlled EEPROMs in the 25LC1024-I/P family. These devices are filled up with instructions with arguments of total size 10 bytes each which cause the Vritual machine to draw graphics, change memory, change the program counter, etc.
 
 As of right now, you must manually enter the bytes using a hexeditor, however an asssembly language and assembler will be created eventually
 

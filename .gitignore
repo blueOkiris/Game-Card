@@ -4,3 +4,6 @@ rom-writer/bin/
 rom-writer/obj/
 rom-writer-linux-x64
 libSystem.IO.Ports.Native.so
+assembler/bin
+assembler/obj
+assembler-linux-x64
