@@ -48,7 +48,7 @@ namespace assembler {
         }
     }
     
-    class Parser {
+    static class Parser {
         public static CompoundToken BuildProgram(SymbolToken[] tokens) {
             var children = new List<Token>();
             
@@ -183,7 +183,7 @@ namespace assembler {
         }
     }
     
-    class Lexer {
+    static class Lexer {
         private static Dictionary<Regex, TokenType> patternsToTypes =
                 new Dictionary<Regex, TokenType>() {
             {
@@ -227,6 +227,11 @@ namespace assembler {
                     });
                     line++;
                     col = 0;
+                } else if(code[ind] == ';') {
+                    while(ind < code.Length && code[ind] != '\n') {
+                        ind++;
+                    }
+                    ind--;
                 }
 
                 foreach(var pattern in patternsToTypes.Keys) {

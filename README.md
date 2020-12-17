@@ -18,7 +18,7 @@ Code for the business-card sized game console, the Game Card
 
 Games are created in the custom assembly language which will be documented at a later date.
 
-These are assembled into hex files using the assembler (build with `make assembler-linux-x64`). These hex files contain instructions which can be written to by the rom-writer (see next section).
+These are assembled into hex files using the assembler (build with `make gcas`). These hex files contain instructions which can be written to by the rom-writer (see next section).
 
 ## Programming ROMs
 

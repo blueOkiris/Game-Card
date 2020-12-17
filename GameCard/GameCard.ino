@@ -25,7 +25,7 @@
     'J', 'G', 0, 0, 0, 0, 0, 0, 0, 20,
     'U', 'S', 0, 0, 0, 0, 0, 0, 0, 0,
     'R', 0, 'L', 0, 0, 0, 1, 'R', 0, 0,
-    'J', 'J', 0, 0, 0, 0, 0, 0, 0, 13,
+    'J', 'J', 0, 0, 0, 0, 0, 0, 0, 12,
 };*/
 
 gamecard::VirtualMachine vm;
@@ -48,13 +48,8 @@ void setup() {
 
 void loop() {
     uint8_t cmd[VM_CMD_LEN];
-    /*for(int j = 0; j < VM_CMD_LEN; j++) {
-        cmd[j] = pgm_read_byte_near(testApp + vm.pc * VM_CMD_LEN + j);
-    }
-    */
     rom.instruction(vm.pc, &cmd);
     vm.execute(cmd);
-    
     while(vm.pc >= programSize);
 }
 
