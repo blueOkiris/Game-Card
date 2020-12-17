@@ -1,0 +1,14 @@
+<program>       ::= <label> | <instruction>
+
+<label>         ::= <ident> ':'
+<instruction>   ::= <mnemonic> [ <data-list> ]
+<data-list>     ::= <data> { ',' <data> }
+<data>          ::= <int> | <register> | <update-word>
+
+<comma>         ::= /,/
+<colon>         ::= /:/
+<mnemonic>      ::= /mov|add|sub|mul|div|rs|ls|upd|spr|sprx|spry|spri|bgi|tile|cmp|je|jne|jl|jg|jle|jge|jmp/
+<ident>         ::= /[A-Za-z_][A-Za-z0-9_]/
+<int>           ::= /0x[0-9]+|-?[0-9]+/
+<register>      ::= /[rR][eE][gG][0-9]+/
+<update-word>   ::= /both|bg|spr/
