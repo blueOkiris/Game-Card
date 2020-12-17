@@ -259,6 +259,10 @@ void VirtualMachine::init() {
         }
         _bg[i] = 0;
     }
+    
+    for(int i = 0; i < VM_NUM_REGS; i++) {
+        _regs[i] = 0;
+    }
     pc = 0;
 }
 
@@ -310,56 +314,145 @@ void VirtualMachine::_updateSprites() {
 }
 
 void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
+    /*Serial.println(F("Executing command: "));
+    Serial.print((char) command[0]);
+    Serial.print(F(", { "));
+    for(int i = 1; i < VM_CMD_LEN; i++) {
+        Serial.print(command[i], HEX);
+        Serial.print(F(" "));
+    }
+    Serial.println(F("}"));*/
+    
     switch(command[0]) {
-        case 'S':                       // Sprite
+        case 'S': {                     // Set sprite
             _clearSprite(command[1]);
-            // 0 is S
-            // 1 is the index
-            // 2-rest is the data
-            switch(command[2]) {
+            
+            uint8_t index;
+            uint8_t values[3] = { 0, 0, 0 };
+            switch(command[1]) {
+                case 'L':
+                    index = command[2];
+                    break;
+                case 'R':
+                    index = _regs[command[2]];
+            }
+            
+            switch(command[3]) {
                 case 'W':               // Entire
-                    _sprs[command[1]] = {
-                        command[3], command[4], command[5]
-                    };
+                    switch(command[4]) {
+                        case 'L':
+                            values[0] = command[5];
+                            break;
+                        case 'R':
+                            values[0] = _regs[command[5]];
+                            break;
+                    }
+                    switch(command[6]) {
+                        case 'L':
+                            values[1] = command[7];
+                            break;
+                        case 'R':
+                            values[1] = _regs[command[7]];
+                            break;
+                    }
+                    switch(command[8]) {
+                        case 'L':
+                            values[2] = command[9];
+                            break;
+                        case 'R':
+                            values[3] = _regs[command[9]];
+                            break;
+                    }
+                    /*Serial.print(F("Setting sprite "));
+                    Serial.print(index, HEX);
+                    Serial.print(F(" to { "));
+                    Serial.print(values[0], HEX);
+                    Serial.print(F(" "));
+                    Serial.print(values[1], HEX);
+                    Serial.print(F(" "));
+                    Serial.print(values[2], HEX);
+                    Serial.println(F("}"));*/
+                    _sprs[index] = { values[0], values[1], values[2] };
                     break;
                 case 'X':               // X
-                    switch(command[3]) {
+                    switch(command[4]) {
+                        case 'L':
+                            values[0] = command[5];
+                            break;
+                        case 'R':
+                            values[0] = _regs[command[5]];
+                            break;
+                    }
+                    switch(command[6]) {
                         case 'R':       // Relative
-                            _sprs[command[1]].x += command[4];
+                            _sprs[index].x += values[0];
                             break;
                         case 'S':       // Set
-                            _sprs[command[1]].x = command[4];
+                            _sprs[index].x = values[0];
                             break;
                     }
                     break;
                 case 'Y':               // Y
-                    switch(command[3]) {
+                    switch(command[4]) {
+                        case 'L':
+                            values[0] = command[5];
+                            break;
+                        case 'R':
+                            values[0] = _regs[command[5]];
+                            break;
+                    }
+                    switch(command[6]) {
                         case 'R':       // Relative
-                            _sprs[command[1]].y += command[4];
+                            _sprs[index].y += values[0];
                             break;
                         case 'S':       // Set
-                            _sprs[command[1]].y = command[4];
+                            _sprs[index].y = values[0];
                             break;
                     }
                     break;
                 case 'I':               // Image
-                    _sprs[command[1]].image = command[3];
+                    switch(command[5]) {
+                        case 'L':
+                            values[0] = command[5];
+                            break;
+                        case 'R':
+                            values[0] = _regs[command[5]];
+                            break;
+                    }
+                    _sprs[index].image = values[0];
                     break;
             }
-            break;
+        } break;
             
-        case 'T':                       // Tile
+        case 'T':                       // Set tile
             // 0 is T
             // 1 is index
             // 2-rest is data
             _copyTile(command[1], ((uint8_t *) command) + 2);
             break;
         
-        case 'B':                       // Background
-            _bg[command[1]] = command[2];
-            break;
+        case 'B': {                     // Set Background
+            uint8_t index;
+            switch(command[1]) {
+                case 'L':
+                    index = command[2];
+                    break;
+                case 'R':
+                    index = _regs[command[2]];
+                    break;
+            }
+            
+            switch(command[3]) {
+                case 'R':
+                    _bg[index] = _regs[command[4]];
+                    break;
+                case 'L':
+                    _bg[index] = command[4];
+                    break;
+            }
+        } break;
         
-        case 'U':                       // Update
+        case 'U':                       // Update gfx
             switch(command[1]) {
                 case 'A':               // Update sprites and map
                     _updateSprites();
@@ -373,6 +466,86 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
                     break;
             }
             break;
+        
+        case 'R': {                     // Set register
+            int64_t data = 0;
+            // command[1] is the index
+            switch(command[2]) {
+                case 'L':               // literal
+                    data =
+                        (command[3] << 24) + (command[4] << 16)
+                        + (command[5] << 8) + (command[6]);
+                    switch(command[7]) {
+                        case 'S':
+                            _regs[command[1]] = data;
+                            break;
+                        case 'R':
+                            _regs[command[1]] += data;
+                            break;
+                    }
+                    break;
+                case 'R':
+                    data = _regs[command[3]];
+                    switch(command[4]) {
+                        case 'S':
+                            _regs[command[1]] = data;
+                            break;
+                        case 'R':
+                            _regs[command[1]] += data;
+                            break;
+                    }
+                    break;
+            }
+            switch(command[7])
+            break;
+        }
+        
+        case 'C':                       // Compare
+            _cmpReg =
+                _regs[command[1]] == _regs[command[2]] ?
+                    CompareState::Equal :
+                    _regs[command[1]] < _regs[command[2]] ?
+                    CompareState::LessThan :
+                    CompareState::GreaterThan;
+            break;
+        
+        case 'J': {                     // Jump
+            bool shouldJump = false;
+            switch(command[1]) {
+                case 'J':               // Just jump
+                    shouldJump = true;
+                    break;
+                case '=':               // Jump if ==
+                    shouldJump = _cmpReg == CompareState::Equal;
+                    break;
+                case '<':               // Jump if <
+                    shouldJump = _cmpReg == CompareState::LessThan;
+                    break;
+                case '>':               // Jump if >
+                    shouldJump = _cmpReg == CompareState::GreaterThan;
+                    break;
+                case 'L':               // Jump if <=
+                    shouldJump =
+                        _cmpReg == CompareState::Equal
+                        || _cmpReg == CompareState::LessThan;
+                    break;
+                case 'G':               // Jump if >=
+                    shouldJump =
+                        _cmpReg == CompareState::Equal
+                        || _cmpReg == CompareState::GreaterThan;
+                    break;
+                case '!':               // Jump if !=
+                    shouldJump = _cmpReg != CompareState::Equal;
+                    break;
+            }
+            if(shouldJump) {
+                pc =
+                    (command[2] << 56) + (command[3] << 48)
+                    + (command[4] << 40) + (command[5] << 32)
+                    + (command[6] << 24) + (command[7] << 16)
+                    + (command[8] << 8) + command[9];
+            }
+        } break;
     }
     
     pc++;

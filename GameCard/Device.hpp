@@ -34,6 +34,7 @@
 #define VM_MAP_SIZE             128     // 128/8 * 64/8 = 16 * 8 = 128
 #define VM_MAX_SPRITES          32
 #define VM_MAX_TILES            64
+#define VM_NUM_REGS             10
 #define VM_CMD_LEN              10
 
 namespace gamecard {
@@ -61,6 +62,10 @@ namespace gamecard {
     };
     
     typedef uint8_t Image[8];
+    
+    enum class CompareState {
+        Equal, LessThan, GreaterThan
+    };
 
     class VirtualMachine {
         private:
@@ -68,6 +73,8 @@ namespace gamecard {
             Image _tiles[VM_MAX_TILES];
             uint8_t _bg[VM_MAP_SIZE];
             Sprite _sprs[VM_MAX_SPRITES];
+            int32_t _regs[VM_NUM_REGS];
+            CompareState _cmpReg;
             
             void _copyTile(uint8_t index, uint8_t data[8]);
             void _clearSprite(uint8_t index);
@@ -75,7 +82,7 @@ namespace gamecard {
             void _updateMap();
         
         public:
-            uint32_t pc;
+            uint64_t pc;
             
             void init();
             void execute(uint8_t command[VM_CMD_LEN]);
