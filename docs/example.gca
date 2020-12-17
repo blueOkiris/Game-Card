@@ -1,0 +1,29 @@
+start:
+    tile    1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+    tile    2, 0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF
+
+    mov     reg1, 16
+    mov     reg0, 0
+
+set_bg:
+    bgi     reg0, 2
+    add     reg0, 1
+    cmp     reg0, reg1
+    jg      sprites
+    jmp     set_bg
+    
+sprites:
+    spr     0, 5, 5, 1
+    upd     sprites
+
+move_spr:
+    mov     reg1, 16
+    mov     reg0, 5
+    mov     sprx, reg0
+    cmp     reg0, reg1
+    jg      end
+    upd     sprites
+    add     reg0, 1
+    jmp     move_spr
+
+end:

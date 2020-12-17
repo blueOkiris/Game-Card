@@ -1,14 +1,15 @@
-<program>       ::= <label> | <instruction>
+<program>       ::= <label> | <instruction> | '\n'
 
-<label>         ::= <ident> ':'
-<instruction>   ::= <mnemonic> [ <data-list> ]
+<label>         ::= <ident> ':' '\n'
+<instruction>   ::= <mnemonic> [ <data-list> ] '\n'
 <data-list>     ::= <data> { ',' <data> }
-<data>          ::= <int> | <register> | <update-word>
+<data>          ::= <int> | <register> | <update-word> | <ident>
 
+<newline>       ::= /\n/
 <comma>         ::= /,/
 <colon>         ::= /:/
-<mnemonic>      ::= /mov|add|sub|mul|div|rs|ls|upd|spr|sprx|spry|spri|bgi|tile|cmp|je|jne|jl|jg|jle|jge|jmp/
+<mnemonic>      ::= /mov|add|sub|mul|div|rs|ls|upd|tile|spr|spri|bgi|cmp|je|jne|jl|jg|jle|jge|jmp/
 <ident>         ::= /[A-Za-z_][A-Za-z0-9_]/
 <int>           ::= /0x[0-9]+|-?[0-9]+/
-<register>      ::= /[rR][eE][gG][0-9]+/
-<update-word>   ::= /both|bg|spr/
+<register>      ::= /[rR][eE][gG][0-9]+|sprx|spry/
+<update-word>   ::= /both|map|sprites/
