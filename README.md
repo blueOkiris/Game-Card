@@ -21,3 +21,7 @@ ROMs are programmed in hex and loaded onto cartridges which contain SPI controll
 As of right now, you must manually enter the bytes using a hexeditor, however an asssembly language and assembler will be created eventually
 
 See the instruction set for ROMs in the [instruction set document](./docs/instr.md)
+
+Once a file is created, you can burn it to a ROM cartridge by attaching the cartridge to an Arduino UNO via SPI and using the rom-writer application.
+
+Build the x86 app with `make rom-writer-linux-x64` and upload the rom-writer sketch to your UNO with `make writer-upload`. Note that the shared library file created is __required__ for the x86 program to run

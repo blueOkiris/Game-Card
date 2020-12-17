@@ -49,10 +49,9 @@ writer-upload : rom-writer/$(WR_SKETCH)/$(WR_SKETCH).ino $(WR_HPPFILES) $(WR_CPP
 	$(WR_ASC) --upload --board $(WR_BOARD) $<
 
 $(WR_OBJNAME)-$(WR_RUNTIME) : $(WR_SRC)
-	dotnet publish rom-writer/$(WR_PROJNAME).csproj \
-	    -f $(WR_FRAMEWORK) -r $(WR_RUNTIME) \
-	    -p:PublishSingleFile=true --self-contained false
+	dotnet publish rom-writer/$(WR_PROJNAME).csproj -r $(WR_RUNTIME) -p:PublishSingleFile=true
 	cp rom-writer/bin/Debug/$(WR_FRAMEWORK)/$(WR_RUNTIME)/publish/$(WR_PROJNAME) ./$(WR_OBJNAME)-$(WR_RUNTIME)
+	cp rom-writer/bin/Debug/$(WR_FRAMEWORK)/$(WR_RUNTIME)/publish/libSystem.IO.Ports.Native.so ./
 	chmod +x $(WR_OBJNAME)
 
 .PHONY : clean
@@ -61,3 +60,4 @@ clean :
 	rm -rf rom-writer/obj
 	rm -rf $(WR_OBJNAME)-$(WR_RUNTIME)
 	rm -rf /var/tmp/.net
+	rm -rf libSystem.IO.Ports.Native.so
