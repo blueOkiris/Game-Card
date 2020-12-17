@@ -182,3 +182,7 @@ Here's two instructions to show the combination of jump with the compare instruc
 }
 ```
 Jumps to instruction 20+1 = 21 if the compare register is equal to zero, i.e. if reg 0 >= reg 1
+
+__Planned Instructions__
+
+ - Read from input buttons
