@@ -1,2 +1,5 @@
 ArducamSSD1306/
 .vscode/
+rom-writer/bin/
+rom-writer/obj/
+rom-writer-linux-x64
