@@ -24,4 +24,4 @@ See the instruction set for ROMs in the [instruction set document](./docs/instr.
 
 Once a file is created, you can burn it to a ROM cartridge by attaching the cartridge to an Arduino UNO via SPI and using the rom-writer application.
 
-Build the x86 app with `make rom-writer-linux-x64` and upload the rom-writer sketch to your UNO with `make writer-upload`. Note that the shared library file created is __required__ for the x86 program to run
+Build the x86 app with `make rom-writer-linux-x64` and upload the rom-writer sketch to your UNO with `make writer-upload`. Note that the shared library file created is __required__ for the x86 program to run. Run the program with either `./rom-writer-linux-x64 <rom file name>` or `./rom-writer-linux-x64 <rom file name> <port name>`

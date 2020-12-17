@@ -1,9 +1,12 @@
 ﻿using System;
 using System.IO.Ports;
+using System.IO;
 
 namespace RomWriter {
     class Program {
         private static string receivedData = "";
+        private static bool connected = false, received = true;
+        private static int index = 0;
         
         static void Main(string[] args) {
             if(args.Length < 1) {
@@ -11,6 +14,11 @@ namespace RomWriter {
                 Environment.Exit(1);
             } else if(args.Length > 2) {
                 Console.WriteLine("Too many arguments provided");
+            }
+            
+            if(!File.Exists(args[0])) {
+                Console.WriteLine("Cannot find file " + args[0]);
+                Environment.Exit(1);
             }
             
             string port = "";
@@ -47,20 +55,45 @@ namespace RomWriter {
             serialPort.Open();
             
             while(!receivedData.EndsWith("READY!"));
-            
             Console.WriteLine("\nSending write byte...");
             serialPort.Write(new byte[1] { 0xA5 }, 0, 1);
-            
             while(!receivedData.EndsWith("Received!\r\n"));
+            connected = true;
+            
+            
+            var data = File.ReadAllBytes(args[0]);
+            //serialPort.Write(data, 0, data.Length);
+            for(int i = 0; i < data.Length; i++) {
+                while(!received);
+                serialPort.Write(data, i, 1);
+                received = false;
+            }
+            while(!received);
+            Console.WriteLine();
         }
         
         private static void SerialPortDataReceived(
                 object sender, SerialDataReceivedEventArgs eventArgs) {
             var serialPort = (SerialPort) sender;
             var data = serialPort.ReadExisting();
-            Console.Write(data);
             
-            receivedData += data;
+            if(!connected) {
+                Console.Write(data);
+                receivedData += data;
+            } else {
+                foreach(var c in data) {
+                    Console.Write(
+                        BitConverter.ToString(new byte[] { (byte) c })
+                    );
+                    Console.Write(' ');
+                    index++;
+                    if(index >= 10) {
+                        Console.WriteLine();
+                        index = 0;
+                    }
+                }
+                received = true;
+            }
         }
     }
 }
