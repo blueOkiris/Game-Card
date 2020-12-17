@@ -3,6 +3,8 @@ using System.IO.Ports;
 
 namespace RomWriter {
     class Program {
+        private static string receivedData = "";
+        
         static void Main(string[] args) {
             if(args.Length < 1) {
                 Console.WriteLine("Expected file name as first argument!");
@@ -44,7 +46,12 @@ namespace RomWriter {
             serialPort.DataReceived += SerialPortDataReceived;
             serialPort.Open();
             
-            while(true);
+            while(!receivedData.EndsWith("READY!"));
+            
+            Console.WriteLine("\nSending write byte...");
+            serialPort.Write(new byte[1] { 0xA5 }, 0, 1);
+            
+            while(!receivedData.EndsWith("Received!\r\n"));
         }
         
         private static void SerialPortDataReceived(
@@ -52,6 +59,8 @@ namespace RomWriter {
             var serialPort = (SerialPort) sender;
             var data = serialPort.ReadExisting();
             Console.Write(data);
+            
+            receivedData += data;
         }
     }
 }

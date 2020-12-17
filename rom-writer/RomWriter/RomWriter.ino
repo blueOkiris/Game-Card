@@ -1,11 +1,27 @@
 int i = 0;
 
 void setup() {
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
+    
     Serial.begin(9600);
+    Serial.print(F("READY!"));
+    
+    bool cont = false;
+    while(!cont) {
+        if(Serial.available() > 0) {
+            Serial.println(F("\nReceived!"));
+            auto test = Serial.read();
+            if(test == 0xA5) {
+                cont = true;
+            }
+        }
+    }
 }
 
 void loop() {
-    Serial.print(F("Hello "));
-    Serial.println(i++);
-    delay(1000);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(500);
 }
