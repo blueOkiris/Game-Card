@@ -34,7 +34,7 @@
 #define VM_MAP_SIZE             128     // 128/8 * 64/8 = 16 * 8 = 128
 #define VM_MAX_SPRITES          32
 #define VM_MAX_TILES            64
-#define VM_NUM_REGS             10
+#define VM_NUM_REGS             32
 #define VM_CMD_LEN              10
 
 namespace gamecard {

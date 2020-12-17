@@ -13,3 +13,7 @@ Code for the business-card sized game console, the Game Card
 3. Close arduino and find your device port using `ls /dev/ttyA* && ls /dev/ttyU*`
 
 4. If your port is `/dev/ttyACM0`, then simply run `make`. Otherwise run `PORT=<your port here> make`
+
+## Programming Games
+
+See the instruction set for ROMs in the [instruction set document](./docs/instr.md)
