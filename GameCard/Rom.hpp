@@ -26,11 +26,12 @@ namespace gamecard {
     #define ROM_CMD_READ    0x03
     #define ROM_SPI_CS      10
     
-    class Eeprom25LC1024 {
+    // 512 kb = 64kB
+    class Eeprom25LC512 {
         public:
             void init() const;
             void instruction(
-                uint32_t addr, uint8_t (*buffer)[VM_CMD_LEN]
+                uint16_t addr, uint8_t (*buffer)[VM_CMD_LEN]
             ) const;
     };
 }

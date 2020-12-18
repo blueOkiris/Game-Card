@@ -29,7 +29,7 @@
 };*/
 
 gamecard::VirtualMachine vm;
-const gamecard::Eeprom25LC1024 rom;
+const gamecard::Eeprom25LC512 rom;
 uint64_t programSize;
 
 void setup() {

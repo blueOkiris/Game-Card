@@ -23,10 +23,10 @@
 #define ROM_CMD_WRITE   0x02
 #define ROM_SPI_CS      10
 
-class Eeprom25LC1024 {
+class Eeprom25LC512 {
     public:
         void init() const;
-        void write(uint32_t addr, uint8_t byte) const;
+        void write(uint16_t addr, uint8_t byte) const;
 };
 
 #endif

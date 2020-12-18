@@ -1,7 +1,7 @@
 #include "Rom.hpp"
 
-uint32_t addr;
-Eeprom25LC1024 rom;
+uint16_t addr;
+Eeprom25LC512 rom;
 
 void setup() {    
     Serial.begin(9600);
