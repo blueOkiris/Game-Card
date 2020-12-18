@@ -159,11 +159,6 @@ namespace assembler {
                                 return new byte[] {};
                         }
                         hex.Add(tile);
-                        
-                        // Just padding
-                        while(hex.Count % 10 != 0) {
-                            hex.Add(0x00);
-                        }
                     } break;
                     
                     case "add":
@@ -343,11 +338,6 @@ namespace assembler {
                                 hex.Add((byte) '>');
                                 break;
                         }
-                        
-                        // Just padding
-                        while(hex.Count % 10 != 0) {
-                            hex.Add(0x00);
-                        }
                     } break;
                     
                     case "spr":
@@ -444,11 +434,6 @@ namespace assembler {
                                 hex.Add((byte) 'I');
                             }
                         }
-                        
-                        // Just padding
-                        while(hex.Count % 10 != 0) {
-                            hex.Add(0x00);
-                        }
                     break;
                     
                     case "upd":
@@ -473,11 +458,6 @@ namespace assembler {
                                 hex.Add((byte) 'S');
                                 break;
                         }
-                        
-                        // Just padding
-                        while(hex.Count % 10 != 0) {
-                            hex.Add(0x00);
-                        }
                         break;
                     
                     case "cmp": {
@@ -497,11 +477,71 @@ namespace assembler {
                         hex.Add((byte) 'C');
                         hex.Add(byte.Parse(reg1Str.Substring(3)));
                         hex.Add(byte.Parse(reg2Str.Substring(3)));
-                        
-                        // Just padding
-                        while(hex.Count % 10 != 0) {
-                            hex.Add(0x00);
+                    } break;
+                    
+                    case "jmp":
+                    case "je":
+                    case "jne":
+                    case "jl":
+                    case "jg":
+                    case "jle":
+                    case "jge": {
+                        if(dataList.Length > 1) {
+                            Console.WriteLine(
+                                "Error: To many arguemnts in jump on line {0}.",
+                                mnemonic.Line
+                            );
+                            return new byte[] {};
                         }
+                        if(dataList[0].Type != TokenType.Ident) {
+                            Console.WriteLine(
+                                "Error: Expected label in jump on line {0}.",
+                                mnemonic.Line
+                            );
+                            return new byte[] {};
+                        }
+                        
+                        hex.Add((byte) 'J');
+                        switch(mnemonic.Source) {
+                            case "jmp":
+                                hex.Add((byte) 'J');
+                                break;
+                            case "je":
+                                hex.Add((byte) '=');
+                                break;
+                            case "jne":
+                                hex.Add((byte) '!');
+                                break;
+                            case "jl":
+                                hex.Add((byte) '<');
+                                break;
+                            case "jg":
+                                hex.Add((byte) '>');
+                                break;
+                            case "jle":
+                                hex.Add((byte) 'L');
+                                break;
+                            case "jge":
+                                hex.Add((byte) 'G');
+                                break;
+                        }
+                        
+                        var labelName = (dataList[0] as SymbolToken).Source;
+                        if(!labels.ContainsKey(labelName)) {
+                            Console.WriteLine(
+                                "Error: Cannot find label {0} on line {1}",
+                                labelName, mnemonic.Line
+                            );
+                        }
+                        var labelIndex = labels[labelName] - 1;
+                        hex.Add(0);
+                        hex.Add(0);
+                        hex.Add(0);
+                        hex.Add(0);
+                        hex.Add((byte) (labelIndex >> 24));
+                        hex.Add((byte) (labelIndex >> 16));
+                        hex.Add((byte) (labelIndex >> 8));
+                        hex.Add((byte) (labelIndex >> 0));
                     } break;
                     
                     default:
@@ -510,6 +550,11 @@ namespace assembler {
                             mnemonic.Source, mnemonic.Line
                         );
                         return new byte[] {};
+                }
+                        
+                // Just padding
+                while(hex.Count % 10 != 0) {
+                    hex.Add(0x00);
                 }
             }
             

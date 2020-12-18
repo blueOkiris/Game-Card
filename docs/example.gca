@@ -9,8 +9,8 @@ set_bg:
     bgi     reg0, 2
     add     reg0, 1
     cmp     reg0, reg1
-    ;jg      init_spr
-    ;jmp     set_bg
+    jge     init_spr
+    jmp     set_bg
     
 init_spr:
     upd     map
@@ -25,9 +25,9 @@ init_spr:
 move_spr:
     mov     sprx, 0, reg0
     cmp     reg0, reg1
-    ;jg      end
+    jge     end
     upd     sprites
-    ;add     reg0, 1
-    ;jmp     move_spr
+    add     reg0, 1
+    jmp     move_spr
 
 end:
