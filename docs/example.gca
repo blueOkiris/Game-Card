@@ -13,7 +13,7 @@ set_bg:
     ;jmp     set_bg
     
 init_spr:
-    ;spr     0, 5, 5, 1
+    spr     0, 5, 5, 1
     ;upd     sprites
     
     ; Get ready to loop and move the sprite

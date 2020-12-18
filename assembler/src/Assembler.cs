@@ -350,6 +350,54 @@ namespace assembler {
                         }
                     } break;
                     
+                    case "spr":
+                        if(dataList.Length < 7) {
+                            Console.WriteLine(
+                                "Error: Expected register or int for sprite "
+                                    + "index, x position, y position, and tile"
+                                    + " on line {0}.",
+                                mnemonic.Line
+                            );
+                            return new byte[] {};
+                        }
+                        hex.Add((byte) 'S');
+                        for(int i = 0; i < 4; i++) {
+                            var tok = dataList[i * 2] as SymbolToken;
+                            var str = tok.Source;
+                            byte value = 0;
+                            switch(tok.Type) {
+                                case TokenType.Int: {
+                                    if(str.StartsWith("0x")) {
+                                        value = Convert.ToByte(str, 16);
+                                    } else {
+                                        value = byte.Parse(str);
+                                    }
+                                    
+                                    hex.Add((byte) 'L');
+                                } break;
+                                
+                                case TokenType.Register: {
+                                    value = byte.Parse(str.Substring(3));
+                                    hex.Add((byte) 'R');
+                                } break;
+                                
+                                default:
+                                    Console.WriteLine(
+                                        "Error: Expected register or int "
+                                            + " for value but "
+                                            + " received {0} on line {1}.",
+                                        tok.Type, tok.Line
+                                    );
+                                    return new byte[] {};
+                            }
+                            
+                            hex.Add(value);
+                            if(i == 0) {
+                                hex.Add((byte) 'W');
+                            }
+                        }
+                    break;
+                    
                     default:
                         Console.WriteLine(
                             "Error: Unknown instruction '{0}' on line {1}",
