@@ -6,7 +6,8 @@ using System;
 namespace assembler {
     enum TokenType {
         Program, Label, Instruction, DataList, Data,
-        Comma, Colon, Mnemonic, Ident, Int, Register, UpdateWord, NewLine
+        Comma, Colon, Mnemonic, Ident, Int, Register, UpdateWord, SpritePiece,
+        NewLine
     }
     
     class Token {
@@ -193,16 +194,16 @@ namespace assembler {
                 new Regex(@":", RegexOptions.Compiled),
                 TokenType.Colon
             }, {
+                new Regex(
+                    @"[rR][eE][gG][0-9]+", RegexOptions.Compiled
+                ),
+                TokenType.Register
+            }, {
                 new Regex(@"[A-Za-z_][A-Za-z0-9_]+", RegexOptions.Compiled),
                 TokenType.Ident
             }, {
                 new Regex(@"0x[0-9A-Fa-f]+|-?[0-9]+", RegexOptions.Compiled),
                 TokenType.Int
-            }, {
-                new Regex(
-                    @"[rR][eE][gG][0-9]+|sprx|spry", RegexOptions.Compiled
-                ),
-                TokenType.Register
             }
         };
         private static string[] mnemonics = {
@@ -211,6 +212,9 @@ namespace assembler {
         };
         private static string[] updateWords = {
             "both", "map", "sprites"
+        };
+        private static string[] spritePieces = {
+            "sprx", "spry"
         };
         
         public static SymbolToken[] Tokens(string code) {
@@ -230,8 +234,13 @@ namespace assembler {
                 } else if(code[ind] == ';') {
                     while(ind < code.Length && code[ind] != '\n') {
                         ind++;
+                        col++;
                     }
                     ind--;
+                    col--;
+                    continue;
+                } else if(char.IsWhiteSpace(code[ind])) {
+                    continue;
                 }
 
                 foreach(var pattern in patternsToTypes.Keys) {
@@ -248,6 +257,11 @@ namespace assembler {
                             foreach(var updateWord in updateWords) {
                                 if(match.Value == updateWord) {
                                     type = TokenType.UpdateWord;
+                                }
+                            }
+                            foreach(var spritePiece in spritePieces) {
+                                if(match.Value == spritePiece) {
+                                    type = TokenType.SpritePiece;
                                 }
                             }
                         }

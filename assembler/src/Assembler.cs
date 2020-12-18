@@ -43,10 +43,10 @@ namespace assembler {
             var hex = new List<byte>();
             foreach(var instruction in instructions) {
                 var mnemonic = instruction.Children[0] as SymbolToken;
+                var dataList =
+                    (instruction.Children[1] as CompoundToken).Children;
                 switch(mnemonic.Source) {
                     case "tile": {
-                        var dataList =
-                            (instruction.Children[1] as CompoundToken).Children;
                         hex.Add((byte) 'T');
                         if(dataList[0].Type != TokenType.Int) {
                             Console.WriteLine(
@@ -86,6 +86,83 @@ namespace assembler {
                                 );
                                 hex.Add(b);
                             }
+                        }
+                    } break;
+                    
+                    case "bgi": {
+                        hex.Add((byte) 'B');
+                        
+                        var indexTok = dataList[0] as SymbolToken;
+                        byte index = 0;
+                        switch(indexTok.Type) {
+                            case TokenType.Register:
+                                hex.Add((byte) 'R');
+                                index = byte.Parse(
+                                    indexTok.Source.Substring(3)
+                                );
+                                break;
+                            case TokenType.Int:
+                                hex.Add((byte) 'L');
+                                if(indexTok.Source.StartsWith("0x")) {
+                                    index = Convert.ToByte(
+                                        indexTok.Source, 16
+                                    );
+                                } else {
+                                    index = byte.Parse(indexTok.Source);
+                                }
+                                break;
+                            default:
+                                Console.WriteLine(
+                                    "Error: Expected number or register for "
+                                        + "bg tile index but received {0} on "
+                                        + "line {1}.",
+                                    dataList[0].Type, mnemonic.Line
+                                );
+                                return new byte[] {};
+                        }
+                        hex.Add(index);
+                        
+                        if(dataList.Skip(1).ToArray().Length != 2) {
+                            Console.WriteLine(
+                                "Error: Expected ONE integer or register "
+                                    + "after index in bgi on line {0}",
+                                mnemonic.Line
+                            );
+                            return new byte[] {};
+                        }
+                        var tileIndex = dataList[2] as SymbolToken;
+                        byte tile = 0;
+                        switch(tileIndex.Type) {
+                            case TokenType.Register:
+                                hex.Add((byte) 'R');
+                                tile = byte.Parse(
+                                    tileIndex.Source.Substring(3)
+                                );
+                                break;
+                            case TokenType.Int:
+                                hex.Add((byte) 'L');
+                                if(tileIndex.Source.StartsWith("0x")) {
+                                    tile = Convert.ToByte(
+                                        tileIndex.Source, 16
+                                    );
+                                } else {
+                                    tile = byte.Parse(tileIndex.Source);
+                                }
+                                break;
+                            default:
+                                Console.WriteLine(
+                                    "Error: Expected number or register for "
+                                        + "bg tile index but received {0} on "
+                                        + "line {1}.",
+                                    dataList[0].Type, mnemonic.Line
+                                );
+                                return new byte[] {};
+                        }
+                        hex.Add(tile);
+                        
+                        // Just padding
+                        while(hex.Count % 10 != 0) {
+                            hex.Add(0x00);
                         }
                     } break;
                     
