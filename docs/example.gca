@@ -13,8 +13,10 @@ set_bg:
     ;jmp     set_bg
     
 init_spr:
+    upd     map
+    
     spr     0, 5, 5, 1
-    ;upd     sprites
+    upd     sprites
     
     ; Get ready to loop and move the sprite
     mov     reg1, 16
@@ -24,7 +26,7 @@ move_spr:
     mov     sprx, 0, reg0
     ;cmp     reg0, reg1
     ;jg      end
-    ;upd     sprites
+    upd     sprites
     ;add     reg0, 1
     ;jmp     move_spr
 

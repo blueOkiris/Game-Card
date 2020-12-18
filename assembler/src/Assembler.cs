@@ -451,6 +451,35 @@ namespace assembler {
                         }
                     break;
                     
+                    case "upd":
+                        if(dataList[0].Type != TokenType.UpdateWord) {
+                            Console.WriteLine(
+                                "Error: Expected update word on line {0}",
+                                mnemonic.Line
+                            );
+                            return new byte[] {};
+                        }
+                        
+                        hex.Add((byte) 'U');
+                        
+                        switch((dataList[0] as SymbolToken).Source) {
+                            case "all":
+                                hex.Add((byte) 'A');
+                                break;
+                            case "map":
+                                hex.Add((byte) 'M');
+                                break;
+                            case "sprites":
+                                hex.Add((byte) 'S');
+                                break;
+                        }
+                        
+                        // Just padding
+                        while(hex.Count % 10 != 0) {
+                            hex.Add(0x00);
+                        }
+                        break;
+                    
                     default:
                         Console.WriteLine(
                             "Error: Unknown instruction '{0}' on line {1}",
