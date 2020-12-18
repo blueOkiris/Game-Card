@@ -20,6 +20,10 @@ Games are created in the custom assembly language which will be documented at a 
 
 These are assembled into hex files using the assembler (build with `make gcas`). These hex files contain instructions which can be written to by the rom-writer (see next section).
 
+For a guide on writing assembly for this device, see [Assembly Guide](./docs/asm.md)
+
+This guide assumes you are already familiar with assembly and simply want to know how this specific system works.
+
 ## Programming ROMs
 
 ROMs are written in hex and loaded onto cartridges which contain SPI controlled EEPROMs in the 25LC1024-I/P family. These devices are filled up with instructions with arguments of total size 10 bytes each which cause the Vritual machine to draw graphics, change memory, change the program counter, etc.
