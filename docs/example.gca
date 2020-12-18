@@ -8,7 +8,7 @@ start:
 set_bg:
     bgi     reg0, 2
     add     reg0, 1
-    ;cmp     reg0, reg1
+    cmp     reg0, reg1
     ;jg      init_spr
     ;jmp     set_bg
     
@@ -24,7 +24,7 @@ init_spr:
     
 move_spr:
     mov     sprx, 0, reg0
-    ;cmp     reg0, reg1
+    cmp     reg0, reg1
     ;jg      end
     upd     sprites
     ;add     reg0, 1

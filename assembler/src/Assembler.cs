@@ -480,6 +480,30 @@ namespace assembler {
                         }
                         break;
                     
+                    case "cmp": {
+                        if(dataList.Length < 3
+                                || dataList[0].Type != TokenType.Register
+                                || dataList[2].Type != TokenType.Register) {
+                            Console.WriteLine(
+                                "Error: Expected two registers in compare on "
+                                    + "line {0}.",
+                                mnemonic.Line
+                            );
+                            return new byte[] {};
+                        }
+                        var reg1Str = (dataList[0] as SymbolToken).Source;
+                        var reg2Str = (dataList[2] as SymbolToken).Source;
+                        
+                        hex.Add((byte) 'C');
+                        hex.Add(byte.Parse(reg1Str.Substring(3)));
+                        hex.Add(byte.Parse(reg2Str.Substring(3)));
+                        
+                        // Just padding
+                        while(hex.Count % 10 != 0) {
+                            hex.Add(0x00);
+                        }
+                    } break;
+                    
                     default:
                         Console.WriteLine(
                             "Error: Unknown instruction '{0}' on line {1}",
