@@ -501,7 +501,7 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
             break;
         
         case 'R': {                     // Set register
-            int64_t data = 0;
+            int32_t data = 0;
             // command[1] is the index
             switch(command[2]) {
                 case 'L':               // literal

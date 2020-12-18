@@ -166,6 +166,190 @@ namespace assembler {
                         }
                     } break;
                     
+                    case "add":
+                    case "sub":
+                    case "mul":
+                    case "div":
+                    case "ls":
+                    case "rs":
+                    case "mov": {
+                        var regName = dataList[0] as SymbolToken;
+                        
+                        switch(regName.Type) {
+                            case TokenType.Register: {
+                                hex.Add((byte) 'R');
+                                
+                                if(dataList.Length != 3) {
+                                    Console.WriteLine(
+                                        "Error: Expected register index then  "
+                                            + " value on line {0}.",
+                                        regName.Line
+                                    );
+                                }
+                                hex.Add(
+                                    byte.Parse(regName.Source.Substring(3))
+                                );
+                                
+                                var indexTok = dataList[2] as SymbolToken;
+                                var indexStr = indexTok.Source;
+                                switch(indexTok.Type) {
+                                    case TokenType.Int: {
+                                        int index = 0;
+                                        if(indexStr.StartsWith("0x")) {
+                                            index = Convert.ToInt32(
+                                                indexStr, 16
+                                            );
+                                        } else {
+                                            index = int.Parse(indexStr);
+                                        }
+                                        
+                                        hex.Add((byte) 'L');
+                                        hex.Add((byte) (index >> 24));
+                                        hex.Add((byte) (index >> 16));
+                                        hex.Add((byte) (index >> 8));
+                                        hex.Add((byte) index);
+                                    } break;
+                                    
+                                    case TokenType.Register: {
+                                        var regInd = byte.Parse(
+                                            indexStr.Substring(3)
+                                        );
+                                        
+                                        hex.Add((byte) 'R');
+                                        hex.Add(regInd);
+                                    } break;
+                                    
+                                    default:
+                                        Console.WriteLine(
+                                            "Error: Expected register or int "
+                                                + " for value but "
+                                                + " received {0} on line {1}.",
+                                            indexTok.Type, indexTok.Line
+                                        );
+                                        return new byte[] {};
+                                }
+                            } break;
+                                
+                            case TokenType.SpritePiece: {
+                                hex.Add((byte) 'S');
+                                
+                                if(dataList.Length != 5) {
+                                    Console.WriteLine(
+                                        "Error: Expected sprite option, sprite "
+                                            + "index, and value on line {0}.",
+                                        regName.Line
+                                    );
+                                }
+                                
+                                var indexTok = dataList[2] as SymbolToken;
+                                var indexStr = indexTok.Source;
+                                switch(indexTok.Type) {
+                                    case TokenType.Int: {
+                                        byte index = 0;
+                                        if(indexStr.StartsWith("0x")) {
+                                            index = Convert.ToByte(
+                                                indexStr, 16
+                                            );
+                                        } else {
+                                            index = byte.Parse(indexStr);
+                                        }
+                                        
+                                        hex.Add((byte) 'L');
+                                        hex.Add(index);
+                                    } break;
+                                    
+                                    case TokenType.Register: {
+                                        var regInd = byte.Parse(
+                                            indexStr.Substring(3)
+                                        );
+                                        
+                                        hex.Add((byte) 'R');
+                                        hex.Add(regInd);
+                                    } break;
+                                    
+                                    default:
+                                        Console.WriteLine(
+                                            "Error: Expected register or int "
+                                                + " for sprite index but "
+                                                + " received {0} on line {1}.",
+                                            indexTok.Type, indexTok.Line
+                                        );
+                                        return new byte[] {};
+                                }
+                                
+                                if(regName.Source == "sprx") {
+                                    hex.Add((byte) 'X');
+                                } else {
+                                    hex.Add((byte) 'Y');
+                                }
+                                
+                                var valueTok = dataList[4] as SymbolToken;
+                                var valueStr = valueTok.Source;
+                                switch(valueTok.Type) {
+                                    case TokenType.Int: {
+                                        byte value = 0;
+                                        if(valueStr.StartsWith("0x")) {
+                                            value = Convert.ToByte(
+                                                valueStr, 16
+                                            );
+                                        } else {
+                                            value = byte.Parse(valueStr);
+                                        }
+                                        
+                                        hex.Add((byte) 'L');
+                                        hex.Add(value);
+                                    } break;
+                                    
+                                    case TokenType.Register: {
+                                        var regInd = byte.Parse(
+                                            valueStr.Substring(3)
+                                        );
+                                        
+                                        hex.Add((byte) 'R');
+                                        hex.Add(regInd);
+                                    } break;
+                                }
+                            } break;
+                            
+                            default:
+                                Console.WriteLine(
+                                    "Error: Expected register, sprx, or spry, "
+                                        + "but received {0} at line {1}.",
+                                    regName.Type, regName.Line
+                                );
+                                break;
+                        }
+                        
+                        switch(mnemonic.Source) {
+                            case "mov":
+                                hex.Add((byte) 'S');
+                                break;
+                            case "add":
+                                hex.Add((byte) 'R');
+                                break;
+                            case "sub":
+                                hex.Add((byte) 'N');
+                                break;
+                            case "mul":
+                                hex.Add((byte) 'P');
+                                break;
+                            case "div":
+                                hex.Add((byte) 'Q');
+                                break;
+                            case "ls":
+                                hex.Add((byte) '>');
+                                break;
+                            case "rs":
+                                hex.Add((byte) '>');
+                                break;
+                        }
+                        
+                        // Just padding
+                        while(hex.Count % 10 != 0) {
+                            hex.Add(0x00);
+                        }
+                    } break;
+                    
                     default:
                         Console.WriteLine(
                             "Error: Unknown instruction '{0}' on line {1}",
@@ -173,6 +357,13 @@ namespace assembler {
                         );
                         return new byte[] {};
                 }
+            }
+            
+            ulong hexSize = (ulong) hex.Count();
+            hex.Insert(0, 0);
+            hex.Insert(0, 0);
+            for(int i = 0; i < 8; i++) {
+                hex.Insert(2, (byte) (hexSize >> (i * 8)));
             }
             return hex.ToArray();
         }

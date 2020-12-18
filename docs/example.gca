@@ -8,24 +8,24 @@ start:
 set_bg:
     bgi     reg0, 2
     add     reg0, 1
-    cmp     reg0, reg1
-    jg      init_spr
-    jmp     set_bg
+    ;cmp     reg0, reg1
+    ;jg      init_spr
+    ;jmp     set_bg
     
 init_spr:
-    spr     0, 5, 5, 1
-    upd     sprites
+    ;spr     0, 5, 5, 1
+    ;upd     sprites
     
     ; Get ready to loop and move the sprite
     mov     reg1, 16
     mov     reg0, 5
     
 move_spr:
-    mov     sprx, reg0
-    cmp     reg0, reg1
-    jg      end
-    upd     sprites
-    add     reg0, 1
-    jmp     move_spr
+    mov     sprx, 0, reg0
+    ;cmp     reg0, reg1
+    ;jg      end
+    ;upd     sprites
+    ;add     reg0, 1
+    ;jmp     move_spr
 
 end:

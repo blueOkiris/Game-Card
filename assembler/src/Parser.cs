@@ -167,7 +167,8 @@ namespace assembler {
             } else if(tokens[i].Type != TokenType.Int
                     && tokens[i].Type != TokenType.Ident
                     && tokens[i].Type != TokenType.UpdateWord
-                    && tokens[i].Type != TokenType.Register) {
+                    && tokens[i].Type != TokenType.Register
+                    && tokens[i].Type != TokenType.SpritePiece) {
                 Console.WriteLine(
                     "Error: Expected data aka integer, identifier, "
                         + "register, or upd term but received"
