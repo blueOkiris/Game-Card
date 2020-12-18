@@ -20,7 +20,9 @@ namespace assembler {
             var tokens = Lexer.Tokens(code);
             var ast = Parser.BuildProgram(tokens);
             var hex = Assembler.Assemble(ast);
-            File.WriteAllBytes(outputFileName, hex);
+            if(hex.Length > 0) {
+                File.WriteAllBytes(outputFileName, hex);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace assembler {
@@ -43,6 +44,51 @@ namespace assembler {
             foreach(var instruction in instructions) {
                 var mnemonic = instruction.Children[0] as SymbolToken;
                 switch(mnemonic.Source) {
+                    case "tile": {
+                        var dataList =
+                            (instruction.Children[1] as CompoundToken).Children;
+                        hex.Add((byte) 'T');
+                        if(dataList[0].Type != TokenType.Int) {
+                            Console.WriteLine(
+                                "Error: Expected integer value for tile index "
+                                    + "but received {0} on line {1}",
+                                instruction.Children[1].Type, mnemonic.Line
+                            );
+                            return new byte[] {};
+                        }
+                        var index = dataList[0] as SymbolToken;
+                        if(index.Source.StartsWith("0x")) {
+                            hex.Add(Convert.ToByte(index.Source, 16));
+                        } else {
+                            hex.Add(byte.Parse(index.Source));
+                        }
+                        var data = dataList.Skip(2).Where(
+                            child => child.Type == TokenType.Int
+                        ).ToArray();
+                        if(data.Length < 2) {
+                            Console.WriteLine(
+                                "Error: Expected 8 integers after tile index, "
+                                    + "but received {0} on line {1}.",
+                                data.Length, mnemonic.Line
+                            );
+                            return new byte[] {};
+                        }
+                        foreach(var datum in data) {
+                            if((datum as SymbolToken).Source.StartsWith("0x")) {
+                                var b = Convert.ToByte(
+                                    (datum as SymbolToken).Source, 16
+                                );
+                                hex.Add(b);
+                            } else {
+                                var b = byte.Parse(
+                                    (datum as SymbolToken).Source,
+                                    NumberStyles.Integer
+                                );
+                                hex.Add(b);
+                            }
+                        }
+                    } break;
+                    
                     default:
                         Console.WriteLine(
                             "Error: Unknown instruction '{0}' on line {1}",
