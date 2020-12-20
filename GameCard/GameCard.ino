@@ -32,10 +32,24 @@ gamecard::VirtualMachine vm;
 const gamecard::Eeprom25LC512 rom;
 uint64_t programSize;
 
+/*
+ * Here we define where to store inputs
+ * Note: They are wired to port D[5:0]
+ * 
+ * A = D0, B = D1
+ * Up = D2, Down = D3, Left = D4, and Right = D5
+ *
+ * vm.regs[INPUT_REG] = D0 & 0x8F;
+ */
+#define PORTD_MASK  0x8F
+
 void setup() {
     Serial.begin(9600);
     vm.init();
     rom.init();
+    
+    // Set buttons as inputs by setting them all to 0
+    DDRB &= ~PORTD_MASK;
     
     uint8_t sizeArr[VM_CMD_LEN];
     vm.pc++;
@@ -49,6 +63,7 @@ void setup() {
 void loop() {
     uint8_t cmd[VM_CMD_LEN];
     rom.instruction(vm.pc, &cmd);
+    vm.input(PIND & PORTD_MASK);
     vm.execute(cmd);
     while(vm.pc >= programSize);
 }

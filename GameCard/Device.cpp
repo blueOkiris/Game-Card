@@ -619,3 +619,6 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
     pc++;
 }
 
+void VirtualMachine::input(int32_t value) {
+    _regs[VM_INPUT_REG] = value;
+}

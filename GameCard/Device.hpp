@@ -36,6 +36,7 @@
 #define VM_MAX_TILES            64
 #define VM_NUM_REGS             32
 #define VM_CMD_LEN              10
+#define VM_INPUT_REG            0
 
 namespace gamecard {
     class Ssd1306 {
@@ -86,6 +87,7 @@ namespace gamecard {
             
             void init();
             void execute(uint8_t command[VM_CMD_LEN]);
+            void input(int32_t value);
             void testDisplay();
     };
 }

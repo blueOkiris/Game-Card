@@ -3,12 +3,12 @@ start:
     tile    2, 0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF
 
     mov     reg1, 16
-    mov     reg0, 0
+    mov     reg2, 0
 
 set_bg:
-    bgi     reg0, 2
-    add     reg0, 1
-    cmp     reg0, reg1
+    bgi     reg2, 2
+    add     reg2, 1
+    cmp     reg2, reg1
     jge     init_spr
     jmp     set_bg
     
@@ -20,14 +20,14 @@ init_spr:
     
     ; Get ready to loop and move the sprite
     mov     reg1, 16
-    mov     reg0, 5
+    mov     reg2, 5
     
 move_spr:
-    mov     sprx, 0, reg0
-    cmp     reg0, reg1
+    mov     sprx, 0, reg2
+    cmp     reg2, reg1
     jge     end
     upd     sprites
-    add     reg0, 1
+    add     reg2, 1
     jmp     move_spr
 
 end:
