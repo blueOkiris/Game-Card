@@ -23,7 +23,7 @@ init_spr:
     mov     reg2, 5
     
 move_spr:
-    mov     sprx, 0, reg2
+    mov     sprx, 2, reg2
     
     ; Check if moved to max position
     cmp     reg2, reg1

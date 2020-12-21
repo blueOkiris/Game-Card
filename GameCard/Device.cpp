@@ -314,7 +314,7 @@ void VirtualMachine::_updateSprites() {
 }
 
 void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
-    Serial.print(F("PC: "));
+    /*Serial.print(F("PC: "));
     Serial.print((unsigned long) pc, DEC);
     Serial.print(F(", Command: "));
     Serial.print((char) command[0]);
@@ -328,6 +328,7 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
     Serial.print(F(", "));
     Serial.print(_regs[3], HEX);
     Serial.println();
+    delay(500);*/
     
     switch(command[0]) {
         case 'S': {                     // Set sprite

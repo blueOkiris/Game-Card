@@ -20,7 +20,7 @@ const uint8_t testApp[] PROGMEM = {
     
     'R', 1, 'L', 0, 0, 0, 16, 'S', 0, 0,
     'R', 2, 'L', 0, 0, 0, 5, 'S', 0, 0,
-    'S', 'L', 0, 'X', 'R', 0, 'S', 0, 0, 0,
+    'S', 'L', 0, 'X', 'R', 2, 'S', 0, 0, 0,
     'C', 2, 1, 0, 0, 0, 0, 0, 0, 0,
     'J', 'G', 0, 0, 0, 0, 0, 0, 0, 0x16,
     'U', 'S', 0, 0, 0, 0, 0, 0, 0, 0,
@@ -68,7 +68,6 @@ void loop() {
     for(int j = 0; j < VM_CMD_LEN; j++) {
         cmd[j] = pgm_read_byte_near(testApp + vm.pc * VM_CMD_LEN + j);
     }
-    delay(100);
     vm.input((~PIND) & PORTD_MASK);
     vm.execute(cmd);
     //while(vm.pc >= programSize);
