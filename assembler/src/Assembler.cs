@@ -332,7 +332,7 @@ namespace assembler {
                                 hex.Add((byte) 'Q');
                                 break;
                             case "ls":
-                                hex.Add((byte) '>');
+                                hex.Add((byte) '<');
                                 break;
                             case "rs":
                                 hex.Add((byte) '>');
