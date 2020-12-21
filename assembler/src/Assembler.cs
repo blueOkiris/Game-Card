@@ -29,7 +29,7 @@ namespace assembler {
                             );
                             return new byte[] {};
                         }
-                        labels.Add(ident.Source, instrIndex * 10);
+                        labels.Add(ident.Source, instrIndex);
                     } break;
                     
                     default:

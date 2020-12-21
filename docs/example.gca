@@ -32,12 +32,11 @@ move_spr:
     
     
     
-    ; Check if a is pressed. If so move
+    ; Check if right is pressed. If so move
     mov     reg3, reg0
     
     ; Get just bit 0
-    rs      reg3, 7
-    ls      reg3, 7
+    rs      reg3, 5
     
     ; Either add 1 or add 0
     add     reg2, reg3
