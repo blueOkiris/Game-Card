@@ -24,10 +24,24 @@ init_spr:
     
 move_spr:
     mov     sprx, 0, reg2
+    
+    ; Check if moved to max position
     cmp     reg2, reg1
     jge     end
     upd     sprites
-    add     reg2, 1
+    
+    
+    
+    ; Check if a is pressed. If so move
+    mov     reg3, reg0
+    
+    ; Get just bit 0
+    rs      reg3, 7
+    ls      reg3, 7
+    
+    ; Either add 1 or add 0
+    add     reg2, reg3
+    
     jmp     move_spr
 
 end:
