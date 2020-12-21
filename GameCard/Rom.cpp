@@ -17,8 +17,9 @@ void Eeprom25LC512::instruction(
     
     SPI.transfer(ROM_CMD_READ);
     
-    SPI.transfer((uint8_t) (addr >> 8));
-    SPI.transfer((uint8_t) (addr & 0x000000FF));
+    uint16_t actual_addr = addr * VM_CMD_LEN;
+    SPI.transfer((uint8_t) (actual_addr >> 8));
+    SPI.transfer((uint8_t) (actual_addr & 0x000000FF));
     
     for(int i = 0; i < 8; i++) {
         (*buffer)[i] = SPI.transfer(0x00);
