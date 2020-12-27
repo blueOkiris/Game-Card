@@ -46,7 +46,7 @@ uint64_t programSize;
 #define PORTD_MASK  0x3F
 
 void setup() {
-    //Serial.begin(9600);
+    Serial.begin(9600);
     vm.init();
     rom.init();
     
@@ -68,6 +68,12 @@ void loop() {
     /*for(int j = 0; j < VM_CMD_LEN; j++) {
         cmd[j] = pgm_read_byte_near(testApp + vm.pc * VM_CMD_LEN + j);
     }*/
+    Serial.print("Instruction: { ");
+    for(int i = 0; i < VM_CMD_LEN; i++) {
+        Serial.print(cmd[i]);
+        Serial.pritn(' ');
+    }
+    Serial.println("}");
     vm.input((~PIND) & PORTD_MASK);
     vm.execute(cmd);
     while(vm.pc >= programSize);
