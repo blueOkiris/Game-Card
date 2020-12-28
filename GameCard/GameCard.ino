@@ -1,5 +1,5 @@
 #include <avr/pgmspace.h>
-#include "Device.hpp"
+//#include "Device.hpp"
 #include "Rom.hpp"
 
 /*const uint8_t testApp[] PROGMEM = {
@@ -47,36 +47,44 @@ uint64_t programSize;
 
 void setup() {
     Serial.begin(9600);
-    vm.init();
     rom.init();
+    //delay(1000);
+    vm.init();
     
     // Set buttons as inputs by setting them all to 0
-    DDRB &= ~PORTD_MASK;
+    DDRD &= ~PORTD_MASK;
     
     uint8_t sizeArr[VM_CMD_LEN];
-    vm.pc++;
-    rom.instruction(0, &sizeArr);
+    rom.instruction(0, sizeArr);
     programSize =
         (sizeArr[2] << 56) + (sizeArr[3] << 48) + (sizeArr[4] << 40)
         + (sizeArr[5] << 32) + (sizeArr[6] << 24) + (sizeArr[7] << 16)
         + (sizeArr[8] << 8) + sizeArr[9];
+    /*Serial.print("Size Array: { ");
+    for(int i = 0; i < VM_CMD_LEN; i++) {
+        Serial.print(sizeArr[i]);
+        Serial.print(' ');
+    }
+    Serial.println("}");
+    Serial.print(F("Size = "));
+    Serial.println((unsigned long) programSize, DEC);*/
 }
 
 void loop() {
     uint8_t cmd[VM_CMD_LEN];
-    rom.instruction(vm.pc, &cmd);
+    rom.instruction(vm.pc + 1, cmd);
     /*for(int j = 0; j < VM_CMD_LEN; j++) {
         cmd[j] = pgm_read_byte_near(testApp + vm.pc * VM_CMD_LEN + j);
     }*/
-    Serial.print("Instruction: { ");
+    /*Serial.print("Instruction: { ");
     for(int i = 0; i < VM_CMD_LEN; i++) {
         Serial.print(cmd[i]);
-        Serial.pritn(' ');
+        Serial.print(' ');
     }
-    Serial.println("}");
+    Serial.println("}");*/
     vm.input((~PIND) & PORTD_MASK);
     vm.execute(cmd);
-    while(vm.pc >= programSize);
+    while(vm.pc * VM_CMD_LEN >= programSize);
     //while(vm.pc >= sizeof(testApp) / VM_CMD_LEN);
 }
 

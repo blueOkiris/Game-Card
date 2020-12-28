@@ -325,10 +325,14 @@ void VirtualMachine::execute(uint8_t command[VM_CMD_LEN]) {
     }
     Serial.print(F("}, IO: 0x"));
     Serial.print(_regs[0], HEX);
-    Serial.print(F(", "));
+    Serial.print(F(", Reg 1: "));
+    Serial.print(_regs[1], HEX);
+    Serial.print(F(", Reg 2: "));
+    Serial.print(_regs[2], HEX);
+    Serial.print(F(", Reg 3: "));
     Serial.print(_regs[3], HEX);
     Serial.println();
-    delay(500);*/
+    delay(100);*/
     
     switch(command[0]) {
         case 'S': {                     // Set sprite

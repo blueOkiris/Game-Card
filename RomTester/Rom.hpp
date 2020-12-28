@@ -12,7 +12,7 @@ namespace tester {
     // 512 kb = 64kB
     class Eeprom25LC512 {
         private:
-            const SpiBus spi = SpiBus();
+            const SpiBus _spi = SpiBus();
             
         public:
             void init() const;

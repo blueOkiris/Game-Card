@@ -1,29 +1,41 @@
 #include <Arduino.h>
-#include <SPI.h>
-#include "Device.hpp"
+#include "Spi.hpp"
 #include "Rom.hpp"
 
 using namespace gamecard;
 
 void Eeprom25LC512::init() const {
-    SPI.begin();
-    pinMode(ROM_SPI_CS, OUTPUT);
-    digitalWrite(ROM_SPI_CS, HIGH);
+    DDRB |= ROM_CS_BMASK;       //pinMode(ROM_SPI_CS, OUTPUT);
+    PORTB |= ROM_CS_BMASK;      //digitalWrite(ROM_SPI_CS, HIGH);
+    
+    _spi.init();
+    delay(50);
+}
+
+uint8_t Eeprom25LC512::read(uint16_t addr) const {
+    PORTB &= ~ROM_CS_BMASK;     //digitalWrite(ROM_SPI_CS, LOW);
+    
+    _spi.transfer(ROM_CMD_READ);
+    _spi.transfer((char) (addr >> 8));
+    _spi.transfer((char) addr);
+    char data = _spi.transfer(0xFF);
+    
+    PORTB |= ROM_CS_BMASK;      //digitalWrite(ROM_SPI_CS, HIGH);
+    return data;
 }
 
 void Eeprom25LC512::instruction(
-        uint16_t addr, uint8_t (*buffer)[VM_CMD_LEN]) const {
-    digitalWrite(ROM_SPI_CS, LOW);
-    
-    SPI.transfer(ROM_CMD_READ);
-    
-    uint16_t actual_addr = addr * VM_CMD_LEN;
-    SPI.transfer((uint8_t) (actual_addr >> 8));
-    SPI.transfer((uint8_t) (actual_addr & 0x000000FF));
-    
-    for(int i = 0; i < 8; i++) {
-        (*buffer)[i] = SPI.transfer(0x00);
+        uint16_t addr, uint8_t buffer[VM_CMD_LEN]) const {
+    int actualAddr = addr * VM_CMD_LEN;
+    for(int i = 0; i < VM_CMD_LEN; i++) {
+        PORTB &= ~ROM_CS_BMASK; //digitalWrite(ROM_SPI_CS, LOW);
+        
+        _spi.transfer(ROM_CMD_READ);
+        _spi.transfer((char) ((actualAddr + i) >> 8));
+        _spi.transfer((char) (actualAddr + i));
+        buffer[i] = _spi.transfer(0xFF);
+        
+        PORTB |= ROM_CS_BMASK;  //digitalWrite(ROM_SPI_CS, HIGH);
+        //delay(1);
     }
-    
-    digitalWrite(ROM_SPI_CS, HIGH);
 }

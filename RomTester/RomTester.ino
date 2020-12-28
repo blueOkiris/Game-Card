@@ -13,9 +13,9 @@ void setup() {
     }
     
     Serial.println(F("Starting write cycle!"));
-    for(int i = 0; i < 512; i++) {
+    /*for(int i = 0; i < 512; i++) {
         rom.write(i, data);
-    }
+    }*/
     
     Serial.print(F("Starting read cycle!"));
 }
@@ -35,5 +35,5 @@ void loop() {
     uint8_t data = rom.read(address++);
     Serial.print(data, HEX);
     Serial.print(F(" "));
-    delay(50);
+    delay(100);
 }

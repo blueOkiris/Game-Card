@@ -8,16 +8,16 @@ void Eeprom25LC512::init() const {
     pinMode(ROM_SPI_CS, OUTPUT);
     digitalWrite(ROM_SPI_CS, HIGH);
     
-    spi.init();
+    _spi.init();
 }
 
 uint8_t Eeprom25LC512::read(uint16_t addr) const {
     digitalWrite(ROM_SPI_CS, LOW);
     
-    spi.transfer(ROM_CMD_READ);
-    spi.transfer((char) (addr >> 8));
-    spi.transfer((char) addr);
-    char data = spi.transfer(0xFF);
+    _spi.transfer(ROM_CMD_READ);
+    _spi.transfer((char) (addr >> 8));
+    _spi.transfer((char) addr);
+    char data = _spi.transfer(0xFF);
     
     digitalWrite(ROM_SPI_CS, HIGH);
     return data;
@@ -25,19 +25,19 @@ uint8_t Eeprom25LC512::read(uint16_t addr) const {
 
 void Eeprom25LC512::write(uint16_t page, uint8_t data[128]) const {
     digitalWrite(ROM_SPI_CS, LOW);
-    spi.transfer(ROM_CMD_WREN);
+    _spi.transfer(ROM_CMD_WREN);
     digitalWrite(ROM_SPI_CS, HIGH);
 
     delay(1);
     
     digitalWrite(ROM_SPI_CS, LOW);
     
-    spi.transfer(ROM_CMD_WRITE);
-    spi.transfer((char) ((page * 128) >> 8));
-    spi.transfer((char) (page * 128));
+    _spi.transfer(ROM_CMD_WRITE);
+    _spi.transfer((char) ((page * 128) >> 8));
+    _spi.transfer((char) (page * 128));
     
     for(int i = 0; i < 128; i++) {
-        spi.transfer(data[i]);
+        _spi.transfer(data[i]);
     }
     
     digitalWrite(ROM_SPI_CS, HIGH);
