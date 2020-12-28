@@ -46,7 +46,7 @@ uint64_t programSize;
 #define PORTD_MASK  0x3F
 
 void setup() {
-    Serial.begin(9600);
+    //Serial.begin(9600);
     rom.init();
     //delay(1000);
     vm.init();
@@ -87,4 +87,3 @@ void loop() {
     while(vm.pc * VM_CMD_LEN >= programSize);
     //while(vm.pc >= sizeof(testApp) / VM_CMD_LEN);
 }
-

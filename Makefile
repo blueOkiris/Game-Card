@@ -1,7 +1,7 @@
 # Build options for Game Card arduino project
 SKETCH := GameCard
 BOARD :=  arduino:avr:uno
-PORT :=   /dev/ttyACM0
+PORT :=   /dev/ttyACM1
 ASC :=    arduino
 
 # Build options for Rom Writer C# project
@@ -50,6 +50,7 @@ clean :
 	rm -rf assembler/obj
 	rm -rf $(AS_OBJNAME)-$(AS_RUNTIME)
 	rm -rf /var/tmp/.net
+	rm -rf $(AS_OBJNAME)
 
 .PHONY : list
 list :
