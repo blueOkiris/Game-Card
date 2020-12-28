@@ -69,6 +69,21 @@ namespace RomWriter {
                 received = false;
             }
             while(!received);
+            
+            // Pad until we write
+            int j = 128 - (data.Length % 128);
+            Console.WriteLine(
+                "\nProgram % 128 is {0}. Printing {1} extras!",
+                data.Length % 128, j
+            );
+            while(j >= 0) {
+                while(!received);
+                serialPort.Write(data, 0, 1);
+                received = false;
+                j--;
+            }
+            
+            while(!received);
             Console.WriteLine();
         }
         
@@ -81,17 +96,16 @@ namespace RomWriter {
                 Console.Write(data);
                 receivedData += data;
             } else {
-                foreach(var c in data) {
-                    Console.Write(
-                        BitConverter.ToString(new byte[] { (byte) c })
-                    );
+                Console.Write(data);
+                if((index + 1) % 10 == 0 && index != 0) {
+                    Console.Write("; ");
+                } else {
                     Console.Write(' ');
-                    index++;
-                    if(index >= 10) {
-                        Console.WriteLine();
-                        index = 0;
-                    }
                 }
+                if((index + 1) % 30 == 0 && index != 0) {
+                    Console.WriteLine();
+                }
+                index++;
                 received = true;
             }
         }

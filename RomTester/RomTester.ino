@@ -25,10 +25,14 @@ void loop() {
         Serial.println();
         Serial.print(F("Page: "));
         Serial.print(address, HEX);
-        Serial.print(F(", Data: "));
+        Serial.println(F(", Data: "));
+    } else if(address % 30 == 0) {
+        Serial.println();
+    } else if(address % 10 == 0) {
+        Serial.print(F("; "));
     }
     
-    char data = rom.read(address++);
+    uint8_t data = rom.read(address++);
     Serial.print(data, HEX);
     Serial.print(F(" "));
     delay(50);

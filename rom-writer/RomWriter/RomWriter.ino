@@ -1,7 +1,9 @@
 #include "Rom.hpp"
 
-uint16_t addr;
-Eeprom25LC512 rom;
+uint16_t page;
+uint8_t buffer[128];
+int bufferInd = 0;
+gamecard::Eeprom25LC512 rom;
 
 void setup() {    
     Serial.begin(9600);
@@ -19,13 +21,24 @@ void setup() {
         }
     }
     
-    addr = 0;
+    page = 0;
+    for(int i = 0; i < 128; i++) {
+        buffer[i] = 0;
+    }
 }
 
 void loop() {
     while(Serial.available() > 0) {
-        auto data = Serial.read();
-        rom.write(addr++, data);
-        Serial.write(data);
+        buffer[bufferInd] = Serial.read();
+        Serial.print(buffer[bufferInd], HEX);
+        bufferInd++;
+                
+        if(bufferInd >= 128) {
+            rom.write(page++, buffer);
+            for(int i = 0; i < 128; i++) {
+                buffer[i] = 0;
+            }
+            bufferInd = 0;
+        }
     }
 }
