@@ -17,7 +17,6 @@ namespace gamecard {
             
         public:
             void init() const;
-            uint8_t read(uint16_t addr) const;
             void instruction(
                 uint16_t addr, uint8_t buffer[VM_CMD_LEN]
             ) const;
