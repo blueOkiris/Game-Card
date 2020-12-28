@@ -26,16 +26,17 @@ uint8_t Eeprom25LC512::read(uint16_t addr) const {
 
 void Eeprom25LC512::instruction(
         uint16_t addr, uint8_t buffer[VM_CMD_LEN]) const {
+    PORTB &= ~ROM_CS_BMASK; //digitalWrite(ROM_SPI_CS, LOW);
+    
+    _spi.transfer(ROM_CMD_READ);
+    
     int actualAddr = addr * VM_CMD_LEN;
+    _spi.transfer((char) ((actualAddr) >> 8));
+    _spi.transfer((char) (actualAddr));
+    
     for(int i = 0; i < VM_CMD_LEN; i++) {
-        PORTB &= ~ROM_CS_BMASK; //digitalWrite(ROM_SPI_CS, LOW);
-        
-        _spi.transfer(ROM_CMD_READ);
-        _spi.transfer((char) ((actualAddr + i) >> 8));
-        _spi.transfer((char) (actualAddr + i));
         buffer[i] = _spi.transfer(0xFF);
-        
-        PORTB |= ROM_CS_BMASK;  //digitalWrite(ROM_SPI_CS, HIGH);
-        //delay(1);
     }
+        
+    PORTB |= ROM_CS_BMASK;  //digitalWrite(ROM_SPI_CS, HIGH);
 }
