@@ -21,6 +21,15 @@ int main() {
     return 0;
 }
 
+// Simple test - draw to screen then read button inputs in a loop
+void testHardware() {
+    const Ssd1306 oled;
+    oled.test();
+    
+    testButtons();
+}
+
+// Complex test - run oled test WHILE reading buttons with both in loop
 void testHardwareMulticore() {
     multicore_launch_core1(testHardwareMulticoreCore1);
     const Ssd1306 oled;
@@ -29,17 +38,12 @@ void testHardwareMulticore() {
     }
 }
 
+// Part of Multicore test - the part on the other core
 void testHardwareMulticoreCore1() {
     testButtons();
 }
 
-void testHardware() {
-    const Ssd1306 oled;
-    oled.test();
-    
-    testButtons();
-}
-
+// Reads and prints button states in a loop
 void testButtons() {
     const Controller cont;
     
