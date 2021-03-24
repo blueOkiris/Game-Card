@@ -14,7 +14,7 @@ include_directories(
 )
 
 target_link_libraries(
-    game-card pico_stdlib hardware_i2c
+    game-card pico_stdlib hardware_i2c pico_multicore
 )
 
 pico_enable_stdio_usb(game-card 1)
