@@ -1,9 +1,4 @@
-ArducamSSD1306/
-.vscode/
-rom-writer/bin/
-rom-writer/obj/
-rom-writer-linux-x64
-libSystem.IO.Ports.Native.so
-assembler/bin
-assembler/obj
-gcas
+.vscode
+*.uf2
+*build
+*.o
