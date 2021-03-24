@@ -6,7 +6,8 @@ pico_sdk_init()
 
 add_executable(
     game-card
-    src/main.cpp src/Oled.cpp
+    src/main.cpp
+    src/Oled.cpp src/Controls.cpp
 )
 include_directories(
     include

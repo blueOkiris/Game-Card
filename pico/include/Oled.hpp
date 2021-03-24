@@ -46,7 +46,7 @@
 namespace gamecard {    
     class Ssd1306 {
         private:
-            void _command(uint8_t cmd) const;
+            void _command(const uint8_t cmd) const;
             
         public:
             Ssd1306();
@@ -58,8 +58,8 @@ namespace gamecard {
                 const uint8_t tileX, const uint8_t tileY
             ) const;
             void putOffsetTile(
-                uint8_t x, uint8_t y,
-                uint8_t data[8], uint8_t bgTiles[4][8]
+                const uint8_t x, const uint8_t y,
+                const uint8_t data[8], const uint8_t bgTiles[4][8]
             ) const;
     };
 }

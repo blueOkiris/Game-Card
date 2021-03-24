@@ -4,7 +4,7 @@
 
 using namespace gamecard;
 
-void Ssd1306::fill(bool isClear) const {
+void Ssd1306::fill(const bool isClear) const {
     uint8_t color = isClear ? 0x00 : 0xFF;
     
     // Move to top left corner
@@ -43,7 +43,8 @@ void Ssd1306::putTile(
 }
 
 void Ssd1306::putOffsetTile(
-        uint8_t x, uint8_t y, uint8_t data[8], uint8_t bgTiles[4][8]) const {
+        const uint8_t x, const uint8_t y,
+        const uint8_t data[8], const uint8_t bgTiles[4][8]) const {
     uint8_t topLeftX = x >> 3;
     uint8_t topLeftY = (y >> 3) << 3;
     
@@ -126,7 +127,7 @@ Ssd1306::Ssd1306() {
     fill(true);
 }
 
-void Ssd1306::_command(uint8_t cmd) const {
+void Ssd1306::_command(const uint8_t cmd) const {
     uint8_t fillCmd[2] = { SSD_CTRL, cmd };
     i2c_write_blocking(I2C_PORT, SSD_I2C_ADDR, fillCmd, 2, false);
 }
