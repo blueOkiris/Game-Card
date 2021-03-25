@@ -33,27 +33,32 @@ namespace gamecard {
     class VirtualMachine {
         private:
             // Multicore
+            static const Display *_disp;
+            static Sprite _sprs[VM_MAX_SPRITES];
+            static Image _tiles[VM_MAX_TILES];
+            static uint8_t _bg[VM_MAP_SIZE];
+            
             static void _displayThreadIrq();
             static void _displayThread();
             
+            static void _updateSprites();
+            static void _updateMap();
+            static void _clearSprite(uint8_t index);
+            
             // Hardware
-            const std::shared_ptr<Display> _disp;
-            const std::shared_ptr<Controller> _cont;
-            const std::shared_ptr<RomChip> _rom;
+            const Controller &_cont;
+            const RomChip &_rom;
             
             // Memory
-            Image _tiles[VM_MAX_TILES];
-            uint8_t _bg[VM_MAP_SIZE];
-            Sprite _sprs[VM_MAX_SPRITES];
             int32_t _regs[VM_NUM_REGS];
             CompareState _cmpReg;
             uint64_t pc;
             
         public:
             VirtualMachine(
-                const std::shared_ptr<Display> &disp,
-                const std::shared_ptr<Controller> &cont,
-                const std::shared_ptr<RomChip> &rom
+                const Display &disp,
+                const Controller &cont,
+                const RomChip &rom
             );
     };
 }

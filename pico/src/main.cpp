@@ -17,15 +17,18 @@ void testHardwareMulticoreCore1();
 
 int main() {
     stdio_init_all();
+    sleep_ms(1000);
     printf("Welcome to gamecard!\n");
     
     //testHardware();
     //testHardwareMulticore();
     
-    const auto oled = std::shared_ptr<Ssd1306>();
-    const auto cont = std::shared_ptr<ButtonController>();
-    const auto rom = std::shared_ptr<M23a1024>();
+    printf("Connecting to hardware\n");
+    const Ssd1306 oled;
+    const ButtonController cont;
+    const M23a1024 rom;
     
+    printf("Starting virtual machine\n");
     const VirtualMachine vm(oled, cont, rom);
     
     return 0;
