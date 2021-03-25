@@ -2,3 +2,5 @@
 *.uf2
 *build
 *.o
+obj/
+bin/

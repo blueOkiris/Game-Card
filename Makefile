@@ -1,4 +1,4 @@
-# Project settings
+# Project settings for main game card file
 OBJNAME :=			game-card
 PROJFOLDER :=		game-card
 SRC :=				$(wildcard $(PROJFOLDER)/src/*.cpp) \
@@ -6,15 +6,23 @@ SRC :=				$(wildcard $(PROJFOLDER)/src/*.cpp) \
 HEADERS :=			$(wildcard $(PROJFOLDER)/include/*.hpp) \
 					$(wildcard common/include/*.hpp)
 
-WR_OBJNAME :=	rom-writer
+# Project settings for SRAM burner aka "rom writer"
+# (yes I know you cant "write" to read only memory, but it isn't really "rom"s)
+WR_OBJNAME :=		rom-writer
 WR_PROJFOLDER :=	rom-writer/pico
-WR_SRC :=		$(wildcard $(WR_PROJFOLDER)/src/*.cpp) \
+WR_SRC :=			$(wildcard $(WR_PROJFOLDER)/src/*.cpp) \
 					$(wildcard common/src/*.cpp)
-WR_HEADERS :=	$(wildcard common/include/*.hpp)
+WR_HEADERS :=		$(wildcard common/include/*.hpp)
+
+# Project settings for PC side of rom writer (C# proj)
+WR_PC_OBJNAME :=	rom-writer-pc
+WR_PC_PROJFOLDER :=	rom-writer/pc
+WR_PC_SRC :=		$(wildcard $(WR_PC_PROJFOLDER)/*.cs)
+WR_PC_ARCH :=		linux-x64
 
 # Helper targets
 .PHONY : all
-all : /tmp/pico-sdk $(OBJNAME).uf2 $(WR_OBJNAME).uf2
+all : /tmp/pico-sdk $(OBJNAME).uf2 $(WR_OBJNAME).uf2 $(WR_PC_OBJNAME)
 
 .PHONY : install-deps
 	@if ! [ "$(shell id -u)" = 0 ];then
@@ -34,6 +42,8 @@ clean :
 	rm -rf $(PROJFOLDER)/build
 	rm -rf $(WR_PROJFOLDER)/build
 	rm -rf *.uf2
+	rm -rf $(WR_PC_PROJFOLDR)/obj
+	rm -rf $(WR_PC_PROJFOLDR)/bin
 
 # Main targets
 $(OBJNAME).uf2 : /tmp/pico-sdk $(SRC) $(HEADERS) $(PROJFOLDER)/CMakeLists.txt
@@ -47,3 +57,12 @@ $(WR_OBJNAME).uf2 : /tmp/pico-sdk $(WR_SRC) $(WR_HEADERS) $(WR_PROJFOLDER)/CMake
 	cd $(WR_PROJFOLDER)/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
 	cd $(WR_PROJFOLDER)/build; make
 	cp $(WR_PROJFOLDER)/build/$(WR_OBJNAME).uf2 .
+
+$(WR_PC_OBJNAME) : $(WR_PC_SRC)
+	cd $(WR_PC_PROJFOLDER); \
+		dotnet publish \
+			-c Release -r $(WR_PC_ARCH) \
+			-p:PublishSingleFile=true --self-contained true
+	cp \
+		$(WR_PC_PROJFOLDER)/bin/Release/net5.0/$(WR_PC_ARCH)/publish/pc \
+		$(WR_PC_OBJNAME)
