@@ -1,7 +1,8 @@
 # Project settings
 OBJNAME :=			game-card
-SRC :=				$(wildcard pico/src/*.cpp)
-HEADERS :=			$(wildcard pico/include/*.hpp)
+PROJFOLDER :=		game-card
+SRC :=				$(wildcard $(PROJFOLDER)/src/*.cpp)
+HEADERS :=			$(wildcard $(PROJFOLDER)/include/*.hpp)
 
 # Helper targets
 .PHONY : all
@@ -22,12 +23,12 @@ all : /tmp/pico-sdk $(OBJNAME).uf2
 .PHONY : clean
 clean :
 	rm -rf /tmp/pico-sdk
-	rm -rf pico/build
+	rm -rf $(PROJFOLDER)/build
 	rm -rf $(OBJNAME).uf2
 
 # Main targets
-$(OBJNAME).uf2 : $(SRC) $(HEADERS) pico/CMakeLists.txt
-	mkdir -p pico/build
-	cd pico/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
-	cd pico/build; make
-	cp pico/build/$(OBJNAME).uf2 .
+$(OBJNAME).uf2 : $(SRC) $(HEADERS) $(PROJFOLDER)/CMakeLists.txt
+	mkdir -p $(PROJFOLDER)/build
+	cd $(PROJFOLDER)/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
+	cd $(PROJFOLDER)/build; make
+	cp $(PROJFOLDER)/build/$(OBJNAME).uf2 .
