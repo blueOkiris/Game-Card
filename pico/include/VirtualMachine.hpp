@@ -10,12 +10,13 @@
 #include <Controls.hpp>
 #include <Rom.hpp>
 
-#define VM_MAP_SIZE         128     // 128/8 * 64/8 = 16 * 8 = 128
+#define VM_MAP_SIZE         128             // 128/8 * 64/8 = 16 * 8 = 128
 #define VM_MAX_SPRITES      32
 #define VM_MAX_TILES        64
 #define VM_NUM_REGS         32
 #define VM_CMD_LEN          10
 #define VM_INPUT_REG        0
+#define VM_PROG_SIZE        (128 * 1024)    // 1 Mb = 1024 Kb = 128 KB
 
 namespace gamecard {
     // Structs for storing image data for efficient drawing
@@ -47,9 +48,9 @@ namespace gamecard {
             
             // Hardware
             const Controller &_cont;
-            const RomChip &_rom;
             
             // Memory
+            uint8_t _rom[VM_PROG_SIZE];
             int32_t _regs[VM_NUM_REGS];
             CompareState _cmpReg;
             uint64_t pc;

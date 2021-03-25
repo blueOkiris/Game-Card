@@ -16,7 +16,7 @@ uint8_t VirtualMachine::_bg[VM_MAP_SIZE];
 
 VirtualMachine::VirtualMachine(
         const Display &disp, const Controller &cont, const RomChip &rom) :
-        _cont(cont), _rom(rom) {
+        _cont(cont) {
     _disp = &disp;
     _disp->fill(true);          // Clear display
     
@@ -38,18 +38,27 @@ VirtualMachine::VirtualMachine(
     pc = 0;
     
     // Set up display multicore
+    printf("Initializing display thread\n");
     multicore_launch_core1(_displayThread);
     
+    // Load the program into memory
+    printf("Loading cartridge into ram.\n");
+    rom.read(0, _rom, VM_PROG_SIZE);
+        
     // Main thread:
     while(1) {
-        //printf("Main thread!\n");
+        
     }
 }
 
 void VirtualMachine::_displayThread() {
+    printf("Hello from second core!\n");
+    
     multicore_fifo_clear_irq();
     irq_set_exclusive_handler(SIO_IRQ_PROC1, _displayThreadIrq);
     irq_set_enabled(SIO_IRQ_PROC1, true);
+    
+    printf("Second thread done initializing!\n");
     
     while(1) {
         tight_loop_contents();
