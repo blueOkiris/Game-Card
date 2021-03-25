@@ -4,3 +4,4 @@
 *.o
 obj/
 bin/
+rom-writer-pc

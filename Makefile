@@ -42,8 +42,9 @@ clean :
 	rm -rf $(PROJFOLDER)/build
 	rm -rf $(WR_PROJFOLDER)/build
 	rm -rf *.uf2
-	rm -rf $(WR_PC_PROJFOLDR)/obj
-	rm -rf $(WR_PC_PROJFOLDR)/bin
+	rm -rf $(WR_PC_OBJNAME)
+	rm -rf $(WR_PC_PROJFOLDER)/obj
+	rm -rf $(WR_PC_PROJFOLDER)/bin
 
 # Main targets
 $(OBJNAME).uf2 : /tmp/pico-sdk $(SRC) $(HEADERS) $(PROJFOLDER)/CMakeLists.txt
