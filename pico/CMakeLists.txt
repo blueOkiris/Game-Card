@@ -5,15 +5,15 @@ project(game-card)
 pico_sdk_init()
 
 add_executable(
-    game-card src/main.cpp
-    src/Oled.cpp src/Controls.cpp src/VirtualMachine.cpp
+    game-card src/main.cpp src/VirtualMachine.cpp
+    src/Oled.cpp src/Controls.cpp src/Rom.cpp
 )
 include_directories(
     include
 )
 
 target_link_libraries(
-    game-card pico_stdlib hardware_i2c pico_multicore
+    game-card pico_stdlib hardware_i2c hardware_spi pico_multicore
 )
 
 pico_enable_stdio_usb(game-card 1)
