@@ -20,4 +20,5 @@ target_link_libraries(
 )
 
 pico_enable_stdio_usb(game-card 1)
+pico_enable_stdio_uart(game-card 0)
 pico_add_extra_outputs(game-card)

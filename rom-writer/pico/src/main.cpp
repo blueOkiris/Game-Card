@@ -6,10 +6,19 @@ using namespace gamecard;
 
 int main() {
     stdio_init_all();
-    printf("Welcome to rom writer!\n");
-    
     const M23a1024 rom;
     
+    sleep_ms(2000);
+    printf("READY!");
+    
+    bool cont = false;
+    while(!cont) {
+        const auto test = getc(stdin);
+        if(test == '0') {
+            printf("\nReceived!\n");
+            cont = true;
+        }
+    }
     
     return 0;
 }

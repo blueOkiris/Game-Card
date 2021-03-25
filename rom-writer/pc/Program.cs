@@ -51,10 +51,11 @@ namespace GameCard {
         private static void performHandshake(SerialPort port) {
             connected = false;
             
+            Console.WriteLine("Waiting for ready...");
             while(!receivedData.EndsWith("READY!"));
             Console.WriteLine("Sending write byte...");
             port.Write(new byte[1] { 0xA5 }, 0, 1);
-            while(!receivedData.EndsWith("Received!\r\n"));
+            while(!receivedData.EndsWith("Received!\n"));
             
             connected = true;
         }
@@ -104,9 +105,9 @@ namespace GameCard {
                 }
             }
             return new SerialPort(port) {
-                BaudRate = 9600, Parity = Parity.None,
+                BaudRate = 115200, Parity = Parity.None,
                 StopBits = StopBits.One, DataBits = 8,
-                Handshake = Handshake.None
+                Handshake = Handshake.XOnXOff
             };
         }
         
