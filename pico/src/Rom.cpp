@@ -84,7 +84,7 @@ void M23a1024::read(
     }
 }
 
-void M23a1024::_writeReg(const uint8_t data) {
+void M23a1024::_writeReg(const uint8_t data) const {
     uint8_t cmd[2] = { M23A1024_WRMR, data };
     gpio_put(PIN_CS, 0);
     spi_write_blocking(SPI_PORT, cmd, 2);

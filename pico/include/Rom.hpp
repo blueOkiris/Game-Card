@@ -39,7 +39,7 @@ namespace gamecard {
     // SRAM implementation of game ROM
     class M23a1024 : public RomChip {
         private:
-            void _writeReg(const uint8_t reg);
+            void _writeReg(const uint8_t reg) const;
             
         public:
             M23a1024();
