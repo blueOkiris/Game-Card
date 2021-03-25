@@ -4,27 +4,27 @@
 
 using namespace gamecard;
 
-Controller::Controller() {
-    gpio_init(static_cast<int>(ControllerButton::Up));
-    gpio_set_dir(static_cast<int>(ControllerButton::Up), false);
-    gpio_pull_up(static_cast<int>(ControllerButton::Up));
-    gpio_init(static_cast<int>(ControllerButton::Down));
-    gpio_set_dir(static_cast<int>(ControllerButton::Down), false);
-    gpio_pull_up(static_cast<int>(ControllerButton::Down));
-    gpio_init(static_cast<int>(ControllerButton::Left));
-    gpio_set_dir(static_cast<int>(ControllerButton::Left), false);
-    gpio_pull_up(static_cast<int>(ControllerButton::Left));
-    gpio_init(static_cast<int>(ControllerButton::Right));
-    gpio_set_dir(static_cast<int>(ControllerButton::Right), false);
-    gpio_pull_up(static_cast<int>(ControllerButton::Right));
-    gpio_init(static_cast<int>(ControllerButton::A));
-    gpio_set_dir(static_cast<int>(ControllerButton::A), false);
-    gpio_pull_up(static_cast<int>(ControllerButton::A));
-    gpio_init(static_cast<int>(ControllerButton::B));
-    gpio_set_dir(static_cast<int>(ControllerButton::B), false);
-    gpio_pull_up(static_cast<int>(ControllerButton::B));
+ButtonController::ButtonController() {
+    gpio_init(static_cast<int>(ControllerInput::Up));
+    gpio_set_dir(static_cast<int>(ControllerInput::Up), false);
+    gpio_pull_up(static_cast<int>(ControllerInput::Up));
+    gpio_init(static_cast<int>(ControllerInput::Down));
+    gpio_set_dir(static_cast<int>(ControllerInput::Down), false);
+    gpio_pull_up(static_cast<int>(ControllerInput::Down));
+    gpio_init(static_cast<int>(ControllerInput::Left));
+    gpio_set_dir(static_cast<int>(ControllerInput::Left), false);
+    gpio_pull_up(static_cast<int>(ControllerInput::Left));
+    gpio_init(static_cast<int>(ControllerInput::Right));
+    gpio_set_dir(static_cast<int>(ControllerInput::Right), false);
+    gpio_pull_up(static_cast<int>(ControllerInput::Right));
+    gpio_init(static_cast<int>(ControllerInput::A));
+    gpio_set_dir(static_cast<int>(ControllerInput::A), false);
+    gpio_pull_up(static_cast<int>(ControllerInput::A));
+    gpio_init(static_cast<int>(ControllerInput::B));
+    gpio_set_dir(static_cast<int>(ControllerInput::B), false);
+    gpio_pull_up(static_cast<int>(ControllerInput::B));
 }
 
-bool Controller::isPressed(const ControllerButton btn) const {
+bool ButtonController::isPressed(const ControllerInput btn) const {
     return !gpio_get(static_cast<int>(btn));
 }

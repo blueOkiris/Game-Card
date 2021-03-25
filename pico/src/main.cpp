@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <memory>
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 #include <Rom.hpp>
-#include <Oled.hpp>
+#include <Display.hpp>
 #include <Controls.hpp>
+#include <VirtualMachine.hpp>
 
 using namespace gamecard;
 
@@ -18,7 +20,13 @@ int main() {
     printf("Welcome to gamecard!\n");
     
     //testHardware();
-    testHardwareMulticore();
+    //testHardwareMulticore();
+    
+    const auto oled = std::shared_ptr<Ssd1306>();
+    const auto cont = std::shared_ptr<ButtonController>();
+    const auto rom = std::shared_ptr<M23a1024>();
+    
+    const VirtualMachine vm(oled, cont, rom);
     
     return 0;
 }
@@ -77,28 +85,28 @@ void testRom() {
 
 // Reads and prints button states in a loop
 void testButtons() {
-    const Controller cont;
+    const ButtonController cont;
     
     while(1) {
         printf("\r                                                           ");
         printf("                                                           \r");
         printf("Reading controller: ");
-        if(cont.isPressed(ControllerButton::Up)) {
+        if(cont.isPressed(ControllerInput::Up)) {
             printf("Up pressed! ");
         }
-        if(cont.isPressed(ControllerButton::Down)) {
+        if(cont.isPressed(ControllerInput::Down)) {
             printf("Down pressed! ");
         }
-        if(cont.isPressed(ControllerButton::Left)) {
+        if(cont.isPressed(ControllerInput::Left)) {
             printf("Left pressed! ");
         }
-        if(cont.isPressed(ControllerButton::Right)) {
+        if(cont.isPressed(ControllerInput::Right)) {
             printf("Right pressed! ");
         }
-        if(cont.isPressed(ControllerButton::A)) {
+        if(cont.isPressed(ControllerInput::A)) {
             printf("A pressed! ");
         }
-        if(cont.isPressed(ControllerButton::B)) {
+        if(cont.isPressed(ControllerInput::B)) {
             printf("B pressed! ");
         }
         sleep_ms(1000);

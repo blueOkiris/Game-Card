@@ -1,6 +1,6 @@
 #include <pico/stdlib.h>
 #include <hardware/i2c.h>
-#include <Oled.hpp>
+#include <Display.hpp>
 
 using namespace gamecard;
 

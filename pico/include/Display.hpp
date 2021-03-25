@@ -43,8 +43,22 @@
 #define I2C_CLOCK_PIN           5
 #define I2C_CLOCK_SPD           1000000
 
-namespace gamecard {    
-    class Ssd1306 {
+namespace gamecard {
+    class Display {
+        public:
+            virtual void fill(const bool isClear) const = 0;
+            virtual void putTile(
+                const uint8_t data[8],
+                const uint8_t tileX, const uint8_t tileY
+            ) const = 0;
+            virtual void putOffsetTile(
+                const uint8_t x, const uint8_t y,
+                const uint8_t data[8], const uint8_t bgTiles[4][8]
+            ) const = 0;
+    };
+    
+    // Oled implementation of a display
+    class Ssd1306 : public Display {
         private:
             void _command(const uint8_t cmd) const;
             
@@ -52,14 +66,14 @@ namespace gamecard {
             Ssd1306();
             void test() const;
             
-            void fill(const bool isClear) const;
+            void fill(const bool isClear) const override;
             void putTile(
                 const uint8_t data[8],
                 const uint8_t tileX, const uint8_t tileY
-            ) const;
+            ) const override;
             void putOffsetTile(
                 const uint8_t x, const uint8_t y,
                 const uint8_t data[8], const uint8_t bgTiles[4][8]
-            ) const;
+            ) const override;
     };
 }

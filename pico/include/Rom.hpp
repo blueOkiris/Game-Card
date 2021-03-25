@@ -1,6 +1,9 @@
 /*
  * This file is for talking to the ROM devices
  * Specifically the 23A1024
+ * 
+ * If I decide to go the NFC route, the two classes CANNOT be used
+ * with each other
  */
 #pragma once
 
@@ -23,7 +26,18 @@
 #define M23A1024_REG_BM 0x00
 
 namespace gamecard {
-    class M23a1024 {
+    class RomChip {
+        public:
+            virtual void write(
+                const uint32_t addr, const uint8_t *buff, const int len
+            ) const = 0;
+            virtual void read(
+                const uint32_t addr, uint8_t *buff, const int len
+            ) const = 0;
+    };
+    
+    // SRAM implementation of game ROM
+    class M23a1024 : public RomChip {
         private:
             void _writeReg(const uint8_t reg);
             
@@ -31,9 +45,9 @@ namespace gamecard {
             M23a1024();
             void write(
                 const uint32_t addr, const uint8_t *buff, const int len
-            ) const;
+            ) const override;
             void read(
                 const uint32_t addr, uint8_t *buff, const int len
-            ) const;
+            ) const override;
     };
 };

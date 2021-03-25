@@ -6,7 +6,7 @@ pico_sdk_init()
 
 add_executable(
     game-card src/main.cpp src/VirtualMachine.cpp
-    src/Oled.cpp src/Controls.cpp src/Rom.cpp
+    src/Display.cpp src/Controls.cpp src/Rom.cpp
 )
 include_directories(
     include
