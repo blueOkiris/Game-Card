@@ -4,14 +4,15 @@ project(game-card)
 
 pico_sdk_init()
 
+get_filename_component(PARENT_DIR ../ ABSOLUTE)
 add_executable(
     game-card src/main.cpp src/VirtualMachine.cpp
     src/Display.cpp src/Controls.cpp
-    ../common/src/Rom.cpp
+    ${PARENT_DIR}/common/src/Rom.cpp
 )
 include_directories(
     include
-    ../common/include
+    ${PARENT_DIR}/common/include
 )
 
 target_link_libraries(
@@ -19,6 +20,4 @@ target_link_libraries(
 )
 
 pico_enable_stdio_usb(game-card 1)
-pico_enable_stdio_uart(game-card 1)
-
 pico_add_extra_outputs(game-card)
