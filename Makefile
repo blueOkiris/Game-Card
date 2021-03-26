@@ -23,7 +23,7 @@ WR_PC_ARCH :=		linux-x64
 
 # Helper targets
 .PHONY : all
-all : /tmp/pico-sdk $(OBJNAME).uf2 $(WR_OBJNAME).uf2 $(WR_PC_OBJNAME)
+all : /tmp/pico-sdk $(OBJNAME).uf2 $(WR_PC_OBJNAME)
 
 .PHONY : install-deps
 	@if ! [ "$(shell id -u)" = 0 ];then
@@ -54,12 +54,6 @@ $(OBJNAME).uf2 : /tmp/pico-sdk $(SRC) $(HEADERS) $(PROJFOLDER)/CMakeLists.txt
 	cd $(PROJFOLDER)/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
 	cd $(PROJFOLDER)/build; make
 	cp $(PROJFOLDER)/build/$(OBJNAME).uf2 .
-
-$(WR_OBJNAME).uf2 : /tmp/pico-sdk $(WR_SRC) $(WR_HEADERS) $(WR_PROJFOLDER)/CMakeLists.txt
-	mkdir -p $(WR_PROJFOLDER)/build
-	cd $(WR_PROJFOLDER)/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
-	cd $(WR_PROJFOLDER)/build; make
-	cp $(WR_PROJFOLDER)/build/$(WR_OBJNAME).uf2 .
 
 $(WR_PC_OBJNAME) : $(WR_PC_SRC)
 	cd $(WR_PC_PROJFOLDER); \

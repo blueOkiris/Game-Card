@@ -12,8 +12,13 @@ namespace GameCard {
             checkArgs(args);
             
             var fileName = args[0];
-            var port = getValidPort(args.Length > 1 ? args[1] : "");
+            var portName = getValidPortName(args.Length > 1 ? args[1] : "");
             
+            var port = new SerialPort(portName) {
+                BaudRate = 9600, Parity = Parity.None,
+                StopBits = StopBits.One, DataBits = 8,
+                Handshake = Handshake.None
+            };
             port.DataReceived += serialPortDataReceived;
             port.Open();
             
@@ -55,7 +60,7 @@ namespace GameCard {
             while(!receivedData.EndsWith("READY!"));
             Console.WriteLine("Sending write byte...");
             port.Write(new byte[1] { 0xA5 }, 0, 1);
-            while(!receivedData.EndsWith("Received!\n"));
+            while(!receivedData.EndsWith("Received!\r\n"));
             
             connected = true;
         }
@@ -83,7 +88,7 @@ namespace GameCard {
             }
         }
         
-        private static SerialPort getValidPort(string inputPort) {
+        private static string getValidPortName(string inputPort) {
             var validPortName = false;
             var port = inputPort;
             while(!validPortName) {
@@ -104,11 +109,7 @@ namespace GameCard {
                     port = Console.ReadLine();
                 }
             }
-            return new SerialPort(port) {
-                BaudRate = 115200, Parity = Parity.None,
-                StopBits = StopBits.One, DataBits = 8,
-                Handshake = Handshake.XOnXOff
-            };
+            return port;
         }
         
         private static void checkArgs(string[] args) {
