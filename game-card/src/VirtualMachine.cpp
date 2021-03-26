@@ -144,7 +144,11 @@ VirtualMachine::VirtualMachine(
     printf("Reading program size: ");
     //uint8_t size[8] = { 0, 0, 0, 0, 0, 0, 0, 0x43 };
     //rom.write(0, size, 8);
-    rom.read(0, _rom, 8);
+    for(int i = 0; i < 8; i++) {
+        rom.read(i, _rom + i, 1);
+        printf("%llx ", static_cast<uint64_t>(_rom[i]));
+    }
+    printf(" -> ");
     uint64_t progSize =
         (static_cast<uint64_t>(_rom[0]) << 56)
         + (static_cast<uint64_t>(_rom[1]) << 48)
@@ -154,15 +158,20 @@ VirtualMachine::VirtualMachine(
         + (static_cast<uint64_t>(_rom[5]) << 16)
         + (static_cast<uint64_t>(_rom[6]) << 8)
         + static_cast<uint64_t>(_rom[7]);
-    printf("%u\n", progSize);
-    pc += 8;
+    printf("%llu\n", progSize);
     
     printf("Loading cartridge into ram.\n");
-    rom.read(pc, _rom, progSize - 8);
+    for(uint64_t i = 8; i < progSize; i++) {
+        rom.read(i, _rom + i, 1);
+        printf("[%llu]=%x ", i, _rom[i]);
+    }
+    printf("\n");
+    
+    pc += 8;
         
     // Main thread:
     while(pc < progSize) {
-        printf("Command: %x\n", _rom[pc]);
+        printf("Command: rom[%llu] - %x\n", pc, _rom[pc]);
         switch(_rom[pc++]) {
             /*
              * Set entire sprite
@@ -730,7 +739,7 @@ VirtualMachine::VirtualMachine(
                 for(int i = 0; i < 8; i++) {
                     _tiles[_rom[pc]][i] = _rom[pc + 1 + i];
                 }
-                pc += 10;
+                pc += 9;
                 break;
             
             /*
@@ -801,6 +810,12 @@ VirtualMachine::VirtualMachine(
                     + (static_cast<int32_t>(_rom[pc + 2]) << 16)
                     + (static_cast<int32_t>(_rom[pc + 3]) << 8)
                     + static_cast<int32_t>(_rom[pc + 4]);
+                /*printf(
+                    "_regs[%d] += { %x, %x, %x, %x } -> %ld\n",
+                    _rom[pc],
+                    _rom[pc + 1], _rom[pc + 2], _rom[pc + 3], _rom[pc + 4],
+                    _regs[_rom[pc]]
+                );*/
                 pc += 5;
                 break;
             // _regs[<lit>] += _regs[<lit>]
@@ -884,9 +899,9 @@ VirtualMachine::VirtualMachine(
              */
             case 0x63:
                 _cmpReg =
-                    (_regs[pc] == _regs[pc + 1]) ?
+                    (_regs[_rom[pc]] == _regs[_rom[pc + 1]]) ?
                         CompareState::Equal :
-                        ((_regs[pc] < _regs[pc + 1]) ?
+                        ((_regs[_rom[pc]] < _regs[_rom[pc + 1]]) ?
                             CompareState::LessThan :
                             CompareState::GreaterThan);
                 pc += 2;
@@ -898,61 +913,61 @@ VirtualMachine::VirtualMachine(
             // jump
             case 0x64:
                 pc = 
-                    (static_cast<uint64_t>(_rom[pc + 1]) << 56)
-                    + (static_cast<uint64_t>(_rom[pc + 2]) << 48)
-                    + (static_cast<uint64_t>(_rom[pc + 3]) << 40)
-                    + (static_cast<uint64_t>(_rom[pc + 4]) << 32)
-                    + (static_cast<uint64_t>(_rom[pc + 1]) << 24)
-                    + (static_cast<uint64_t>(_rom[pc + 2]) << 16)
-                    + (static_cast<uint64_t>(_rom[pc + 3]) << 8)
-                    + static_cast<uint64_t>(_rom[pc + 4]);
+                    (static_cast<uint64_t>(_rom[pc]) << 56)
+                    + (static_cast<uint64_t>(_rom[pc + 1]) << 48)
+                    + (static_cast<uint64_t>(_rom[pc + 2]) << 40)
+                    + (static_cast<uint64_t>(_rom[pc + 3]) << 32)
+                    + (static_cast<uint64_t>(_rom[pc + 4]) << 24)
+                    + (static_cast<uint64_t>(_rom[pc + 5]) << 16)
+                    + (static_cast<uint64_t>(_rom[pc + 6]) << 8)
+                    + static_cast<uint64_t>(_rom[pc + 7]);
                 break;
             // jump if ==
             case 0x65:
                 if(_cmpReg == CompareState::Equal) {
                     pc = 
-                        (static_cast<uint64_t>(_rom[pc + 1]) << 56)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 48)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 40)
-                        + (static_cast<uint64_t>(_rom[pc + 4]) << 32)
-                        + (static_cast<uint64_t>(_rom[pc + 1]) << 24)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 16)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 8)
-                        + static_cast<uint64_t>(_rom[pc + 4]);
+                        (static_cast<uint64_t>(_rom[pc]) << 56)
+                        + (static_cast<uint64_t>(_rom[pc + 1]) << 48)
+                        + (static_cast<uint64_t>(_rom[pc + 2]) << 40)
+                        + (static_cast<uint64_t>(_rom[pc + 3]) << 32)
+                        + (static_cast<uint64_t>(_rom[pc + 4]) << 24)
+                        + (static_cast<uint64_t>(_rom[pc + 5]) << 16)
+                        + (static_cast<uint64_t>(_rom[pc + 6]) << 8)
+                        + static_cast<uint64_t>(_rom[pc + 7]);
                 } else {
-                    pc++;
+                    pc += 8;
                 }
                 break;
             // jump if <
             case 0x66:
                 if(_cmpReg == CompareState::LessThan) {
                     pc = 
-                        (static_cast<uint64_t>(_rom[pc + 1]) << 56)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 48)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 40)
-                        + (static_cast<uint64_t>(_rom[pc + 4]) << 32)
-                        + (static_cast<uint64_t>(_rom[pc + 1]) << 24)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 16)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 8)
-                        + static_cast<uint64_t>(_rom[pc + 4]);
+                        (static_cast<uint64_t>(_rom[pc]) << 56)
+                        + (static_cast<uint64_t>(_rom[pc + 1]) << 48)
+                        + (static_cast<uint64_t>(_rom[pc + 2]) << 40)
+                        + (static_cast<uint64_t>(_rom[pc + 3]) << 32)
+                        + (static_cast<uint64_t>(_rom[pc + 4]) << 24)
+                        + (static_cast<uint64_t>(_rom[pc + 5]) << 16)
+                        + (static_cast<uint64_t>(_rom[pc + 6]) << 8)
+                        + static_cast<uint64_t>(_rom[pc + 7]);
                 } else {
-                    pc++;
+                    pc += 8;
                 }
                 break;
             // jump if >
             case 0x67:
                 if(_cmpReg == CompareState::GreaterThan) {
                     pc = 
-                        (static_cast<uint64_t>(_rom[pc + 1]) << 56)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 48)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 40)
-                        + (static_cast<uint64_t>(_rom[pc + 4]) << 32)
-                        + (static_cast<uint64_t>(_rom[pc + 1]) << 24)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 16)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 8)
-                        + static_cast<uint64_t>(_rom[pc + 4]);
+                        (static_cast<uint64_t>(_rom[pc]) << 56)
+                        + (static_cast<uint64_t>(_rom[pc + 1]) << 48)
+                        + (static_cast<uint64_t>(_rom[pc + 2]) << 40)
+                        + (static_cast<uint64_t>(_rom[pc + 3]) << 32)
+                        + (static_cast<uint64_t>(_rom[pc + 4]) << 24)
+                        + (static_cast<uint64_t>(_rom[pc + 5]) << 16)
+                        + (static_cast<uint64_t>(_rom[pc + 6]) << 8)
+                        + static_cast<uint64_t>(_rom[pc + 7]);
                 } else {
-                    pc++;
+                    pc += 8;
                 }
                 break;
             // jump if <=
@@ -960,16 +975,16 @@ VirtualMachine::VirtualMachine(
                 if(_cmpReg == CompareState::Equal
                         || _cmpReg == CompareState::LessThan) {
                     pc = 
-                        (static_cast<uint64_t>(_rom[pc + 1]) << 56)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 48)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 40)
-                        + (static_cast<uint64_t>(_rom[pc + 4]) << 32)
-                        + (static_cast<uint64_t>(_rom[pc + 1]) << 24)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 16)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 8)
-                        + static_cast<uint64_t>(_rom[pc + 4]);
+                        (static_cast<uint64_t>(_rom[pc]) << 56)
+                        + (static_cast<uint64_t>(_rom[pc + 1]) << 48)
+                        + (static_cast<uint64_t>(_rom[pc + 2]) << 40)
+                        + (static_cast<uint64_t>(_rom[pc + 3]) << 32)
+                        + (static_cast<uint64_t>(_rom[pc + 4]) << 24)
+                        + (static_cast<uint64_t>(_rom[pc + 5]) << 16)
+                        + (static_cast<uint64_t>(_rom[pc + 6]) << 8)
+                        + static_cast<uint64_t>(_rom[pc + 7]);
                 } else {
-                    pc++;
+                    pc += 8;
                 }
                 break;
             // jump if >=
@@ -977,32 +992,32 @@ VirtualMachine::VirtualMachine(
                 if(_cmpReg == CompareState::Equal
                         || _cmpReg == CompareState::GreaterThan) {
                     pc = 
-                        (static_cast<uint64_t>(_rom[pc + 1]) << 56)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 48)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 40)
-                        + (static_cast<uint64_t>(_rom[pc + 4]) << 32)
-                        + (static_cast<uint64_t>(_rom[pc + 1]) << 24)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 16)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 8)
-                        + static_cast<uint64_t>(_rom[pc + 4]);
+                        (static_cast<uint64_t>(_rom[pc]) << 56)
+                        + (static_cast<uint64_t>(_rom[pc + 1]) << 48)
+                        + (static_cast<uint64_t>(_rom[pc + 2]) << 40)
+                        + (static_cast<uint64_t>(_rom[pc + 3]) << 32)
+                        + (static_cast<uint64_t>(_rom[pc + 4]) << 24)
+                        + (static_cast<uint64_t>(_rom[pc + 5]) << 16)
+                        + (static_cast<uint64_t>(_rom[pc + 6]) << 8)
+                        + static_cast<uint64_t>(_rom[pc + 7]);
                 } else {
-                    pc++;
+                    pc += 8;
                 }
                 break;
             // jump if !=
             case 0x6A:
                 if(_cmpReg != CompareState::Equal) {
                     pc = 
-                        (static_cast<uint64_t>(_rom[pc + 1]) << 56)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 48)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 40)
-                        + (static_cast<uint64_t>(_rom[pc + 4]) << 32)
-                        + (static_cast<uint64_t>(_rom[pc + 1]) << 24)
-                        + (static_cast<uint64_t>(_rom[pc + 2]) << 16)
-                        + (static_cast<uint64_t>(_rom[pc + 3]) << 8)
-                        + static_cast<uint64_t>(_rom[pc + 4]);
+                        (static_cast<uint64_t>(_rom[pc]) << 56)
+                        + (static_cast<uint64_t>(_rom[pc + 1]) << 48)
+                        + (static_cast<uint64_t>(_rom[pc + 2]) << 40)
+                        + (static_cast<uint64_t>(_rom[pc + 3]) << 32)
+                        + (static_cast<uint64_t>(_rom[pc + 4]) << 24)
+                        + (static_cast<uint64_t>(_rom[pc + 5]) << 16)
+                        + (static_cast<uint64_t>(_rom[pc + 6]) << 8)
+                        + static_cast<uint64_t>(_rom[pc + 7]);
                 } else {
-                    pc++;
+                    pc += 8;
                 }
                 break;
         }

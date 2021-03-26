@@ -23,15 +23,15 @@ int main() {
     
     //testHardware();
     //testHardwareMulticore();
-    testReadRom();
+    //testReadRom();
     
-    /*printf("Connecting to hardware\n");
+    printf("Connecting to hardware\n");
     const Ssd1306 oled;
     const ButtonController cont;
     const M23a1024 rom;
     
     printf("Starting virtual machine\n");
-    const VirtualMachine vm(oled, cont, rom);*/
+    const VirtualMachine vm(oled, cont, rom);
     
     return 0;
 }

@@ -8,7 +8,7 @@ HEADERS :=			$(wildcard $(PROJFOLDER)/include/*.hpp) \
 
 # Project settings for PC side of rom writer (C# proj)
 WR_PC_OBJNAME :=	rom-writer-pc
-WR_PC_PROJFOLDER :=	rom-writer/pc
+WR_PC_PROJFOLDER :=	rom-writer
 WR_PC_SRC :=		$(wildcard $(WR_PC_PROJFOLDER)/*.cs) \
 					$(wildcard $(WR_PC_PROJFOLDER)/pc.csproj)
 WR_PC_ARCH :=		linux-x64
@@ -37,6 +37,7 @@ clean :
 	rm -rf $(WR_PC_OBJNAME)
 	rm -rf $(WR_PC_PROJFOLDER)/obj
 	rm -rf $(WR_PC_PROJFOLDER)/bin
+	rm -rf writer-proj
 	rm -rf libSystem.IO.Ports.Native.so 
 
 # Main targets
@@ -46,14 +47,17 @@ $(OBJNAME).uf2 : /tmp/pico-sdk $(SRC) $(HEADERS) $(PROJFOLDER)/CMakeLists.txt
 	cd $(PROJFOLDER)/build; make
 	cp $(PROJFOLDER)/build/$(OBJNAME).uf2 .
 
-$(WR_PC_OBJNAME) : $(WR_PC_SRC)
+$(WR_PC_OBJNAME) : /tmp/pico-sdk $(WR_PC_SRC)
 	cd $(WR_PC_PROJFOLDER); \
 		dotnet publish \
 			-c Release -r $(WR_PC_ARCH) \
 			-p:PublishSingleFile=true --self-contained true
 	cp \
-		$(WR_PC_PROJFOLDER)/bin/Release/net5.0/$(WR_PC_ARCH)/publish/libSystem.IO.Ports.Native.so \
-		libSystem.IO.Ports.Native.so
-	cp \
 		$(WR_PC_PROJFOLDER)/bin/Release/net5.0/$(WR_PC_ARCH)/publish/pc \
 		$(WR_PC_OBJNAME)
+
+game-writer.uf2 : /tmp/pico-sdk $(WR_PC_OBJNAME) writer-proj/*
+	mkdir -p writer-proj/build
+	cd writer-proj/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
+	cd writer-proj/build; make
+	cp writer-proj/build/game-writer.uf2 .
