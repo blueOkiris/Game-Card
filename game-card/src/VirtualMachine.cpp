@@ -10,9 +10,12 @@
 using namespace gamecard;
 
 const Display *VirtualMachine::_disp = nullptr;
+const Controller *VirtualMachine::_cont = nullptr;
+
 Sprite VirtualMachine::_sprs[VM_MAX_SPRITES];
 Image VirtualMachine::_tiles[VM_MAX_TILES];
 uint8_t VirtualMachine::_bg[VM_MAP_SIZE];
+int32_t VirtualMachine::_regs[VM_NUM_REGS];
 
 void VirtualMachine::_displayThread() {
     printf("Hello from second core!\n");
@@ -68,6 +71,21 @@ void VirtualMachine::_displayThreadIrq() {
             case 4:             // End
                 _disp->fill(true);
                 return;
+            
+            case 5:             // Update controller reg
+                const auto up =
+                    _cont->isPressed(ControllerInput::Up) ? (1 << 5) : 0;
+                const auto down =
+                    _cont->isPressed(ControllerInput::Down) ? (1 << 4) : 0;
+                const auto left =
+                    _cont->isPressed(ControllerInput::Left) ? (1 << 3) : 0;
+                const auto right =
+                    _cont->isPressed(ControllerInput::Right) ? (1 << 2) : 0;
+                const auto a =
+                    _cont->isPressed(ControllerInput::A) ? (1 << 1) : 0;
+                const auto b = _cont->isPressed(ControllerInput::B) ? 1 : 0;
+                _regs[0] = up + down + left + right + a + b;
+                break;
         }
         break;
     }
@@ -116,10 +134,11 @@ void VirtualMachine::_updateMap() {
 }
 
 VirtualMachine::VirtualMachine(
-        const Display &disp, const Controller &cont, const RomChip &rom) :
-        _cont(cont) {
+        const Display &disp, const Controller &cont, const RomChip &rom) {
     _disp = &disp;
     _disp->fill(true);          // Clear display
+    
+    _cont = &cont;
     
     _cmpReg = CompareState::Equal;
     
@@ -1024,9 +1043,18 @@ VirtualMachine::VirtualMachine(
                     pc += 8;
                 }
                 break;
+            
+            /*
+             * Update controller input into reg 0
+             */
+            case 0x6B:
+                while(!multicore_fifo_wready());
+                multicore_fifo_push_blocking(5);
+                break;
         }
     }
     
+    while(!multicore_fifo_wready());
     multicore_fifo_push_blocking(4);
     return;
 }

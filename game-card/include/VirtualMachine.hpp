@@ -33,12 +33,17 @@ namespace gamecard {
     
     class VirtualMachine {
         private:
-            // Multicore
+            // Multicore hardware
             static const Display *_disp;
+            static const Controller *_cont;
+            
+            // Multicore memory
             static Sprite _sprs[VM_MAX_SPRITES];
             static Image _tiles[VM_MAX_TILES];
             static uint8_t _bg[VM_MAP_SIZE];
+            static int32_t _regs[VM_NUM_REGS];
             
+            // Multicore callbacks
             static void _displayThreadIrq();
             static void _displayThread();
             
@@ -46,12 +51,8 @@ namespace gamecard {
             static void _updateMap();
             static void _clearSprite(uint8_t index);
             
-            // Hardware
-            const Controller &_cont;
-            
-            // Memory
+            // First core memory
             uint8_t _rom[VM_PROG_SIZE];
-            int32_t _regs[VM_NUM_REGS];
             CompareState _cmpReg;
             uint64_t pc;
             
