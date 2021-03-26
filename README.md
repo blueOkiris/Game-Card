@@ -12,5 +12,10 @@ I've now moved to version 2 which utilizes the Raspberry Pi Pico, a $4 microcont
 
 ## Building
 
-Run `make`
+To install need dependencies, (on Debian) run `make install-deps`
 
+To build the interpreter and the game-writer project maker run `make`
+
+To create a project for writing a game to a "ROM" chip, run `./rom-writer-pc <filename>`
+
+To build a .uf2 for that project once created, run `make game-writer.uf2`

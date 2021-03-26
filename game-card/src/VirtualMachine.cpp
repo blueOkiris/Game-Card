@@ -64,6 +64,10 @@ void VirtualMachine::_displayThreadIrq() {
                     _tiles[_bg[((row + 1) << 4) + col + 1]], col + 1, row + 1
                 );
             } break;
+            
+            case 4:             // End
+                _disp->fill(true);
+                return;
         }
         break;
     }
@@ -1022,4 +1026,7 @@ VirtualMachine::VirtualMachine(
                 break;
         }
     }
+    
+    multicore_fifo_push_blocking(4);
+    return;
 }
