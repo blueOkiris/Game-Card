@@ -22,10 +22,24 @@
 #define M23A1024_RSTIO  0xFF
 #define M23A1024_RDMR   0x05
 #define M23A1024_WRMR   0x01
-
 #define M23A1024_REG_BM 0x00
 
+#define M25LC512_READ   0x03
+#define M25LC512_WRITE  0x02
+#define M25LC512_WREN   0x06
+#define M25LC512_WRSR   0x01
+
 namespace gamecard {
+    union Instruction {
+        uint32_t val;
+        struct {
+            uint8_t lsb;
+            uint8_t nlsb;
+            uint8_t pmsb;
+            uint8_t msb;
+        };
+    };
+    
     class RomChip {
         public:
             virtual void write(
@@ -37,13 +51,29 @@ namespace gamecard {
             virtual uint64_t size() const = 0;
     };
     
-    // SRAM implementation of game ROM
+    // SRAM implementation of game ROM (Volatile!)
     class M23a1024 : public RomChip {
         private:
             void _writeReg(const uint8_t reg) const;
             
         public:
             M23a1024();
+            void write(
+                const uint32_t addr, const uint8_t *buff, const int len
+            ) const override;
+            void read(
+                const uint32_t addr, uint8_t *buff, const int len
+            ) const override;
+            uint64_t size() const override;
+    };
+    
+    // Eeprom implementation of game ROM (Similar to above, but non-volatile)
+    class M23lc512 : public RomChip {
+        private:
+            void _wren() const;
+        
+        public:
+            M23lc512();
             void write(
                 const uint32_t addr, const uint8_t *buff, const int len
             ) const override;

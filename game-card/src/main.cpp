@@ -28,7 +28,7 @@ int main() {
     printf("Connecting to hardware\n");
     const Ssd1306 oled;
     const ButtonController cont;
-    const M23a1024 rom;
+    const M23lc512 rom;
     
     printf("Starting virtual machine\n");
     const VirtualMachine vm(oled, cont, rom);
