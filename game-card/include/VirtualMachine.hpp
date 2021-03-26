@@ -16,7 +16,6 @@
 #define VM_NUM_REGS         32
 #define VM_CMD_LEN          10
 #define VM_INPUT_REG        0
-#define VM_PROG_SIZE        (128 * 1024)    // 1 Mb = 1024 Kb = 128 KB
 
 namespace gamecard {
     // Structs for storing image data for efficient drawing
@@ -50,11 +49,6 @@ namespace gamecard {
             static void _updateSprites();
             static void _updateMap();
             static void _clearSprite(uint8_t index);
-            
-            // First core memory
-            uint8_t _rom[VM_PROG_SIZE];
-            CompareState _cmpReg;
-            uint64_t pc;
             
         public:
             VirtualMachine(

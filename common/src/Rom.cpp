@@ -95,3 +95,7 @@ void M23a1024::_writeReg(const uint8_t data) const {
     spi_write_blocking(SPI_PORT, cmd, 2);
     gpio_put(PIN_CS, 1);
 }
+
+uint64_t M23a1024::size() const {
+    return 128 * 1024;
+}

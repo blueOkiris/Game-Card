@@ -34,6 +34,7 @@ namespace gamecard {
             virtual void read(
                 const uint32_t addr, uint8_t *buff, const int len
             ) const = 0;
+            virtual uint64_t size() const = 0;
     };
     
     // SRAM implementation of game ROM
@@ -49,5 +50,6 @@ namespace gamecard {
             void read(
                 const uint32_t addr, uint8_t *buff, const int len
             ) const override;
+            uint64_t size() const override;
     };
 };

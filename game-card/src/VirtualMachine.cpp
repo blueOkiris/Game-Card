@@ -140,7 +140,9 @@ VirtualMachine::VirtualMachine(
     
     _cont = &cont;
     
-    _cmpReg = CompareState::Equal;
+    auto _cmpReg = CompareState::Equal;
+    uint8_t _rom[rom.size()];
+    uint64_t pc;
     
     // Initialize memory
     for(int i =0 ; i < VM_MAP_SIZE; i++) {
@@ -1050,6 +1052,19 @@ VirtualMachine::VirtualMachine(
             case 0x6B:
                 while(!multicore_fifo_wready());
                 multicore_fifo_push_blocking(5);
+                break;
+            
+            /*
+             * Delay in ms
+             */
+            case 0x6C:
+                sleep_ms(
+                    (static_cast<uint32_t>(_rom[pc]) << 24)
+                    + (static_cast<uint32_t>(_rom[pc + 1]) << 16)
+                    + (static_cast<uint32_t>(_rom[pc + 2]) << 8)
+                    + static_cast<uint32_t>(_rom[pc + 3])
+                );
+                pc += 4;
                 break;
         }
     }
