@@ -6,14 +6,6 @@ SRC :=				$(wildcard $(PROJFOLDER)/src/*.cpp) \
 HEADERS :=			$(wildcard $(PROJFOLDER)/include/*.hpp) \
 					$(wildcard common/include/*.hpp)
 
-# Project settings for SRAM burner aka "rom writer"
-# (yes I know you cant "write" to read only memory, but it isn't really "rom"s)
-WR_OBJNAME :=		rom-writer
-WR_PROJFOLDER :=	rom-writer/pico
-WR_SRC :=			$(wildcard $(WR_PROJFOLDER)/src/*.cpp) \
-					$(wildcard common/src/*.cpp)
-WR_HEADERS :=		$(wildcard common/include/*.hpp)
-
 # Project settings for PC side of rom writer (C# proj)
 WR_PC_OBJNAME :=	rom-writer-pc
 WR_PC_PROJFOLDER :=	rom-writer/pc
@@ -41,7 +33,6 @@ all : /tmp/pico-sdk $(OBJNAME).uf2 $(WR_PC_OBJNAME)
 clean :
 	rm -rf /tmp/pico-sdk
 	rm -rf $(PROJFOLDER)/build
-	rm -rf $(WR_PROJFOLDER)/build
 	rm -rf *.uf2
 	rm -rf $(WR_PC_OBJNAME)
 	rm -rf $(WR_PC_PROJFOLDER)/obj
