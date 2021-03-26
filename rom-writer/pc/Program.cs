@@ -31,6 +31,7 @@ namespace GameCard {
             var data = File.ReadAllBytes(fileName);
             for(int i = 0; i < data.Length; i++) {
                 while(!received);
+                Console.Write(data[i] + "-");
                 port.Write(data, i, 1);
                 received = false;
             }
@@ -75,12 +76,12 @@ namespace GameCard {
                 receivedData += data;
             } else {
                 Console.Write(data);
-                if((index + 1) % 10 == 0 && index != 0) {
-                    Console.Write("; ");
+                if((index + 1) % 8 == 0 && index != 0) {
+                    Console.Write(";\t");
                 } else {
-                    Console.Write(' ');
+                    Console.Write('\t');
                 }
-                if((index + 1) % 30 == 0 && index != 0) {
+                if((index + 1) % 16 == 0 && index != 0) {
                     Console.WriteLine();
                 }
                 index++;

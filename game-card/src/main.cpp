@@ -11,6 +11,7 @@ using namespace gamecard;
 
 void testButtons();
 void testRom();
+void testReadRom();
 void testHardware();
 void testHardwareMulticore();
 void testHardwareMulticoreCore1();
@@ -22,16 +23,29 @@ int main() {
     
     //testHardware();
     //testHardwareMulticore();
+    testReadRom();
     
-    printf("Connecting to hardware\n");
+    /*printf("Connecting to hardware\n");
     const Ssd1306 oled;
     const ButtonController cont;
     const M23a1024 rom;
     
     printf("Starting virtual machine\n");
-    const VirtualMachine vm(oled, cont, rom);
+    const VirtualMachine vm(oled, cont, rom);*/
     
     return 0;
+}
+
+void testReadRom() {
+    const M23a1024 rom;
+    for(int i = 0; i < 4; i++) {
+        for(int j = 0; j < 8; j++) {
+            uint8_t data;
+            rom.read(i * 8 + j, &data, 1);
+            printf("%d ", data);
+        }
+        printf("\n");
+    }
 }
 
 // Simple test - draw to screen then read button inputs in a loop

@@ -47,11 +47,11 @@ void M23a1024::write(
         cmd[2] = inst.nlsb;
         cmd[3] = inst.lsb;
         cmd[4] = buff[i];
-        printf("Sending: ");
+        /*printf("Sending: ");
         for(int j = 0; j < 5; j++) {
             printf("%d ", cmd[j]);
         }
-        printf("\n");
+        printf("\n");*/
         gpio_put(PIN_CS, 0);
         spi_write_blocking(SPI_PORT, cmd, 5);
         gpio_put(PIN_CS, 1);
@@ -81,6 +81,11 @@ void M23a1024::read(
         spi_write_blocking(SPI_PORT, cmd, 4);
         spi_read_blocking(SPI_PORT, 0xFF, buff + i, 1);
         gpio_put(PIN_CS, 1);
+        /*printf("Sending: ");
+        for(int j = 0; j < 4; j++) {
+            printf("%d ", cmd[j]);
+        }
+        printf(", Read: %d\n", buff[i]);*/
     }
 }
 

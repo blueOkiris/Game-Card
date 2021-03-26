@@ -1,9 +1,5 @@
 #include "Rom.hpp"
 
-uint32_t page;
-uint8_t buffer[128];
-int bufferInd = 0;
-
 using namespace gamecard;
 
 void setup() {    
@@ -22,24 +18,14 @@ void setup() {
         }
     }
     
-    page = 0;
-    for(int i = 0; i < 128; i++) {
-        buffer[i] = 0;
-    }
-    
+    uint32_t addr = 0;
     while(1) {
         while(Serial.available() > 0) {
-            buffer[bufferInd] = Serial.read();
-            Serial.print(buffer[bufferInd], HEX);
-            bufferInd++;
-                    
-            if(bufferInd >= 128) {
-                rom.write(page++, buffer, 128);
-                for(int i = 0; i < 128; i++) {
-                    buffer[i] = 0;
-                }
-                bufferInd = 0;
-            }
+            char data = Serial.read();
+            rom.write(addr, &data, 1);
+            rom.read(addr, &data, 1);
+            addr++;
+            Serial.print(data, HEX);
         }
     }
 }
