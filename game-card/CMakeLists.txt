@@ -4,15 +4,12 @@ project(game-card)
 
 pico_sdk_init()
 
-get_filename_component(PARENT_DIR ../ ABSOLUTE)
 add_executable(
     game-card src/main.cpp src/VirtualMachine.cpp
-    src/Display.cpp src/Controls.cpp
-    ${PARENT_DIR}/common/src/Rom.cpp
+    src/Display.cpp src/Controls.cpp src/Rom.cpp
 )
 include_directories(
     include
-    ${PARENT_DIR}/common/include
 )
 
 target_link_libraries(
