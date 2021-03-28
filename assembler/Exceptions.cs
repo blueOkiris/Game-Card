@@ -15,4 +15,9 @@ namespace Assembler {
                 base("Error: Unexpected token '" + tok + "'") {
         }
     }
+    
+    public class UnexpectedEofException : Exception {
+        public UnexpectedEofException() : base("Error: Unexpected EOF") {
+        }
+    }
 }

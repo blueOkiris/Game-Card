@@ -102,6 +102,7 @@ namespace Assembler {
                     
                     // Lex a string
                     case '\'':
+                        tokens.Add(lexString(code, ref i, ref line, ref pos));
                         continue;
                     
                     // Lex comma
@@ -137,6 +138,58 @@ namespace Assembler {
             }
             
             return tokens.ToArray();
+        }
+        
+        // /'(\\.|[^\\\'])*'/
+        private static SymbolToken lexString(
+                string code, ref int i, ref int line, ref int pos) {
+            var startLine = line;
+            var startPos = pos;
+            var strSrc = new StringBuilder();
+            strSrc.Append(code[i]);
+            i++;
+            pos++;
+            while(i < code.Length && code[i] != '\'') {
+                switch(code[i]) {
+                    case '\\':
+                        if(i + 1 >= code.Length) {
+                            throw new UnexpectedEofException();
+                        }
+                        strSrc.Append('\\');
+                        strSrc.Append(code[i + 1]);
+                        if(code[i + 1] == '\n') {
+                            line++;
+                            pos = 1;
+                        } else {
+                            pos += 2;
+                        }
+                        i += 2;
+                        break;
+                    
+                    case '\n':
+                        strSrc.Append('\n');
+                        line++;
+                        pos = 1;
+                        i++;
+                        break;
+                    
+                    default:
+                        strSrc.Append(code[i]);
+                        i++;
+                        pos++;
+                        break;
+                }
+            }
+            if(i >= code.Length) {
+                throw new UnexpectedEofException();
+            }
+            strSrc.Append('\'');
+            return new SymbolToken() {
+                Type = SymbolTokenType.String,
+                Line = startLine,
+                Pos = startPos,
+                Source = strSrc.ToString()
+            };
         }
     }
 }
