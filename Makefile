@@ -13,9 +13,16 @@ WR_PC_SRC :=		$(wildcard $(WR_PC_PROJFOLDER)/*.cs) \
 					$(wildcard $(WR_PC_PROJFOLDER)/pc.csproj)
 WR_PC_ARCH :=		linux-x64
 
+# Project settings for game card assembler
+AS_OBJNAME :=		gca
+AS_PROJFOLDER :=	assembler
+AS_SRC :=			$(wildcard $(AS_PROJFOLDER)/*.cs) \
+					$(wildcard $(AS_PROJFOLDER)/assembler.csproj)
+AS_ARCH :=			linux-x64
+
 # Helper targets
 .PHONY : all
-all : /tmp/pico-sdk $(OBJNAME).uf2 $(WR_PC_OBJNAME)
+all : /tmp/pico-sdk $(OBJNAME).uf2 $(WR_PC_OBJNAME) $(AS_OBJNAME)
 
 .PHONY : install-deps
 	@if ! [ "$(shell id -u)" = 0 ];then
@@ -37,6 +44,9 @@ clean :
 	rm -rf $(WR_PC_OBJNAME)
 	rm -rf $(WR_PC_PROJFOLDER)/obj
 	rm -rf $(WR_PC_PROJFOLDER)/bin
+	rm -rf $(AS_OBJNAME)
+	rm -rf $(AS_PROJFOLDER)/obj
+	rm -rf $(AS_PROJFOLDER)/bin
 	rm -rf writer-proj
 	rm -rf libSystem.IO.Ports.Native.so 
 
@@ -61,3 +71,12 @@ game-writer.uf2 : /tmp/pico-sdk $(WR_PC_OBJNAME) writer-proj/*
 	cd writer-proj/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
 	cd writer-proj/build; make
 	cp writer-proj/build/game-writer.uf2 .
+
+$(AS_OBJNAME) : $(AS_SRC)
+	cd $(AS_PROJFOLDER); \
+		dotnet publish \
+			-c Release -r $(AS_ARCH) \
+			-p:PublishSingleFile=true --self-contained true
+	cp \
+		$(AS_PROJFOLDER)/bin/Release/net5.0/$(AS_ARCH)/publish/assembler \
+		$(AS_OBJNAME)

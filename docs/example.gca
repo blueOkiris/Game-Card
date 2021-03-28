@@ -1,45 +1,45 @@
 start:
-    tile    1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-    tile    2, 0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF
+    til     1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+    til     2, 0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF
 
-    mov     reg1, 16
-    mov     reg2, 0
+    mov     r 1, 16
+    mov     r 2, 0
 
 set_bg:
-    bgi     reg2, 2
-    add     reg2, 1
-    cmp     reg2, reg1
+    mov     bg r 2, 2
+    add     r 2, 1
+    cmp     r 2, r 1
     jge     init_spr
     jmp     set_bg
     
 init_spr:
     upd     map
     
-    spr     0, 5, 5, 1
-    upd     sprites
+    mov     spr 0, 5, 5, 1
+    upd     sprs
     
     ; Get ready to loop and move the sprite
-    mov     reg1, 16
-    mov     reg2, 5
+    mov     r 1, 16
+    mov     r 2, 5
     
 move_spr:
-    mov     sprx, 2, reg2
+    mov     spx 2, r 2
     
     ; Check if moved to max position
-    cmp     reg2, reg1
+    cmp     r 2, r 1
     jge     end
-    upd     sprites
-    
-    
+    upd     sprs
     
     ; Check if right is pressed. If so move
-    mov     reg3, reg0
+    upd     inp
+    mov     r 3, r 0
     
     ; Get just bit 0
-    rs      reg3, 5
+    shl     r 3, 5
+    shr     r 3, 8
     
     ; Either add 1 or add 0
-    add     reg2, reg3
+    add     r 2, r 3
     
     jmp     move_spr
 
