@@ -6,15 +6,20 @@ namespace Assembler {
         public static void Main(string[] args) {
             var fileNames = getValidFileNames(args);
             
-            var ast = Parser.Parse(fileNames.Item1);
-            var code = CodeGenerator.Generate(ast);
-            
             try {
+                var ast = Parser.Parse(fileNames.Item1);
+                var code = CodeGenerator.Generate(ast);
                 File.WriteAllBytes(fileNames.Item2, code);
             } catch(IOException ioe) {
                 Console.WriteLine("Failed to write bytes to file!");
                 Console.WriteLine(ioe.Message);
                 Environment.Exit(5);
+            } catch(UnexpectedCharacterException uce) {
+                Console.WriteLine(uce.Message);
+                Environment.Exit(6);
+            } catch(UnexpectedSymbolTokenException uste) {
+                Console.WriteLine(uste.Message);
+                Environment.Exit(7);
             }
         }
         
