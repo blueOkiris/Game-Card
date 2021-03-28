@@ -27,9 +27,10 @@ There is an assembler, and it needs a parser
 The language grammar is defined here (note that case is irrelevant):
 
 ```
-<program>       ::= { <inst> | <label> }
+<program>       ::= { <inst> | <label> | <include> }
 <label>         ::= <ident> ':'
 <inst>          ::= <cmd> <arg-list>
+<include>       ::= 'include' <string>
 <ident>         ::= /[a-z_][a-z0-9_]*/
 <cmd>           ::= 'mov' | 'add' | 'sub' | 'mul' | 'div' | 'shr' | 'shl'
                   | 'til' | 'upd' | 'cmp' | 'del'
@@ -39,4 +40,5 @@ The language grammar is defined here (note that case is irrelevant):
                   | 'spx' <arg> | 'spy' <arg> | 'spi' <arg>
                   | 'sprs' | 'map' | 'gfx' | 'inp' | <integer>
 <integer>       ::= /[0-9]+/ | '0b' /[01]+/ | '0x' /[0-9a-f]+/
+<string>        ::= /'(\\.|[^\\\'])*'/
 ```
