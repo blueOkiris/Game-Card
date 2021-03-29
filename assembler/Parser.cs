@@ -55,7 +55,7 @@ namespace Assembler {
         
         public static CompoundToken Parse(string inputFileName) {
             var code = File.ReadAllText(inputFileName).ToLower();
-            var tokens = lex(code);
+            var tokens = lex(inputFileName, code);
             
             // Debug print
             foreach(var token in tokens) {
@@ -69,27 +69,47 @@ namespace Assembler {
                 switch(tokens[i].Type) {
                     case SymbolTokenType.Keyword:
                         switch(tokens[i].Source) {
-                            case "include":
-                                // parse include stmt
-                                break;
+                            // parse include stmt
+                            case "include": {
+                                var include = parseInclude(
+                                    inputFileName, tokens, ref i
+                                );
+                                var fileStr = (SymbolToken) include.Children[1];
+                                var fileName =
+                                    Program.projectFolder
+                                    + fileStr.Source.Substring(
+                                        1, fileStr.Source.Length - 2
+                                    );
+                                if(!File.Exists(fileName)) {
+                                    throw new InvalidIncludeException(
+                                        inputFileName, fileName
+                                    );
+                                }
+                                var subAst = Parse(fileName);
+                                foreach(var token in subAst.Children) {
+                                    children.Add(token);
+                                }
+                            } break;
                             
                             default:
                                 throw new UnexpectedSymbolTokenException(
-                                    tokens[i]
+                                    inputFileName, tokens[i]
                                 );
                         }
                         break;
                     
+                    // parse label
                     case SymbolTokenType.Identifier:
-                        // parse label
                         break;
                     
+                    // parse command
                     case SymbolTokenType.Command:
-                        // parse command
                         break;
                     
                     default:
-                        throw new UnexpectedSymbolTokenException(tokens[i]);
+                        throw new UnexpectedSymbolTokenException(
+                            inputFileName, tokens[i]
+                        );
                 }
             }
             
@@ -100,7 +120,7 @@ namespace Assembler {
             };
         }
         
-        private static SymbolToken[] lex(string code) {
+        private static SymbolToken[] lex(string inputFileName, string code) {
             var tokens = new List<SymbolToken>();
             
             for(int i = 0, line = 1, pos = 1; i < code.Length; i++, pos++) {
@@ -128,7 +148,9 @@ namespace Assembler {
                     
                     // Lex a string
                     case '\'':
-                        tokens.Add(lexString(code, ref i, ref line, ref pos));
+                        tokens.Add(lexString(
+                            inputFileName, code, ref i, ref line, ref pos
+                        ));
                         continue;
                     
                     // Lex comma
@@ -166,10 +188,32 @@ namespace Assembler {
                 }
                 
                 // If we got here, then we messed up!
-                throw new UnexpectedCharacterException(code[i], line, pos);
+                throw new UnexpectedCharacterException(
+                    inputFileName, code[i], line, pos
+                );
             }
             
             return tokens.ToArray();
+        }
+        
+        // 'include' <string>
+        private static CompoundToken parseInclude(
+                string inputFileName, SymbolToken[] tokens, ref int i) {
+            var children = new List<Token>();
+            children.Add(tokens[i++]);
+            if(i >= tokens.Length) {
+                throw new UnexpectedEofException(inputFileName);
+            } else if(tokens[i].Type != SymbolTokenType.String) {
+                throw new UnexpectedSymbolTokenException(
+                    inputFileName, tokens[i]
+                );
+            }
+            children.Add(tokens[i]);
+            return new CompoundToken() {
+                Type = CompoundTokenType.Include,
+                StartingLine = ((SymbolToken) children[0]).Line,
+                Children = children.ToArray()
+            };
         }
         
         // /[0-9]+/ | '0b' /[01]+/ | '0x' /[0-9a-f]+/
@@ -314,7 +358,8 @@ namespace Assembler {
         
         // /'(\\.|[^\\\'])*'/
         private static SymbolToken lexString(
-                string code, ref int i, ref int line, ref int pos) {
+                string inputFileName, string code,
+                ref int i, ref int line, ref int pos) {
             var startLine = line;
             var startPos = pos;
             var strSrc = new StringBuilder();
@@ -325,7 +370,7 @@ namespace Assembler {
                 switch(code[i]) {
                     case '\\':
                         if(i + 1 >= code.Length) {
-                            throw new UnexpectedEofException();
+                            throw new UnexpectedEofException(inputFileName);
                         }
                         strSrc.Append('\\');
                         strSrc.Append(code[i + 1]);
@@ -353,7 +398,7 @@ namespace Assembler {
                 }
             }
             if(i >= code.Length) {
-                throw new UnexpectedEofException();
+                throw new UnexpectedEofException(inputFileName);
             }
             strSrc.Append('\'');
             return new SymbolToken() {
