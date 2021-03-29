@@ -129,9 +129,51 @@ namespace Assembler {
                         instBytes.Add(datum);
                     }
                 } break;
+                
+                // Options: sprs, map, gfx, or inp
+                case "upd": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
                     
-                case "upd":
-                    break;
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    
+                    var argChild = (SymbolToken) arg.Children[0];
+                    switch(argChild.Source) {
+                        case "gfx":
+                            instBytes.Add(0x52);
+                            break;
+                            
+                        case "sprs":
+                            instBytes.Add(0x53);
+                            break;
+                        
+                        case "map":
+                            instBytes.Add(0x54);
+                            break;
+                        
+                        case "inp":
+                            instBytes.Add(0x6B);
+                            break;
+                        
+                        // We should have caught it, but just in case
+                        default:
+                            throw new UnexpectedCompoundTokenException(
+                                arg.File, arg
+                            );
+                    }
+                } break;
                     
                 case "cmp":
                     break;
