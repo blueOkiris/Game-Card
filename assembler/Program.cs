@@ -10,6 +10,7 @@ namespace Assembler {
             
             try {
                 var ast = Parser.Parse(fileNames.Item1);
+                Console.WriteLine(ast);
                 var code = CodeGenerator.Generate(ast);
                 File.WriteAllBytes(fileNames.Item2, code);
             } catch(IOException ioe) {
@@ -91,9 +92,7 @@ namespace Assembler {
                         
                         return (
                             args[2],
-                            projectFolder
-                                + args[2].Substring(0, args[2].Length - 4)
-                                + ".hex"
+                            args[2].Substring(0, args[2].Length - 4) + ".hex"
                         );
                     } else if(args[1] == "-p") {
                         if(!Directory.Exists(args[2])) {
@@ -122,9 +121,7 @@ namespace Assembler {
                         
                         return (
                             args[0],
-                            projectFolder
-                                + args[0].Substring(0, args[0].Length - 4)
-                                + ".hex"
+                            args[0].Substring(0, args[0].Length - 4) + ".hex"
                         );
                     }
                     

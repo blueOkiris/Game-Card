@@ -39,6 +39,35 @@ namespace Assembler {
         public CompoundTokenType Type;
         public Token[] Children;
         public int StartingLine;
+        
+        private string toString(int indent) {
+            var representation = new StringBuilder();
+            for(int i = 0; i < indent; i++) {
+                representation.Append("|--");
+            }
+            representation.Append(Type);
+            representation.Append(" : ");
+            representation.Append(StartingLine);
+            foreach(var child in Children) {
+                if(child is CompoundToken) {
+                    representation.Append("\n");
+                    representation.Append(
+                        ((CompoundToken) child).toString(indent + 1)
+                    );
+                } else {
+                    representation.Append("\n");
+                    for(int i = 0; i < indent + 1; i++) {
+                        representation.Append("|--");
+                    }
+                    representation.Append((SymbolToken) child);
+                }
+            }
+            return representation.ToString();
+        }
+        
+        public override string ToString() {
+            return toString(0);
+        }
     }
     
     public static class Parser {
@@ -58,9 +87,9 @@ namespace Assembler {
             var tokens = lex(inputFileName, code);
             
             // Debug print
-            foreach(var token in tokens) {
+            /*foreach(var token in tokens) {
                 Console.WriteLine(token);
-            }
+            }*/
             
             var children = new List<Token>();
             
@@ -100,6 +129,9 @@ namespace Assembler {
                     
                     // parse label
                     case SymbolTokenType.Identifier:
+                        children.Add(
+                            parseLabel(inputFileName, tokens, ref i)
+                        );
                         break;
                     
                     // parse instruction
@@ -199,6 +231,26 @@ namespace Assembler {
             return tokens.ToArray();
         }
         
+        // <ident> ':'
+        private static CompoundToken parseLabel(
+                string inputFileName, SymbolToken[] tokens, ref int i) {
+            var children = new List<Token>();
+            children.Add(tokens[i++]);
+            if(i >= tokens.Length) {
+                throw new UnexpectedEofException(inputFileName);
+            } else if(tokens[i].Type != SymbolTokenType.Colon) {
+                throw new UnexpectedSymbolTokenException(
+                    inputFileName, tokens[i]
+                );
+            }
+            children.Add(tokens[i]);
+            return new CompoundToken() {
+                Type = CompoundTokenType.Label,
+                StartingLine = ((SymbolToken) children[0]).Line,
+                Children = children.ToArray()
+            };
+        }
+        
         // <cmd> <arg-list>
         private static CompoundToken parseInstruction(
                 string inputFileName, SymbolToken[] tokens, ref int i) {
@@ -236,19 +288,21 @@ namespace Assembler {
         /*
          *   'r' <arg>   | 'bg' <arg>  | 'spr' <arg>
          * | 'spx' <arg> | 'spy' <arg> | 'spi' <arg>
-         * | 'sprs'      | 'map'       | 'gfx' 
-         * | 'inp'       | <integer>
+         * | 'sprs'      | 'map'       | 'gfx'
+         * | 'inp'       | <integer>   | <identifier>
          */
         private static CompoundToken parseArgument(
                 string inputFileName, SymbolToken[] tokens, ref int i) {
             if(tokens[i].Type != SymbolTokenType.Keyword
-                    && tokens[i].Type != SymbolTokenType.Integer) {
+                    && tokens[i].Type != SymbolTokenType.Integer
+                    && tokens[i].Type != SymbolTokenType.Identifier) {
                 throw new UnexpectedSymbolTokenException(
                     inputFileName, tokens[i]
                 );
             }
             
-            if(tokens[i].Type == SymbolTokenType.Integer) {
+            if(tokens[i].Type == SymbolTokenType.Integer
+                    || tokens[i].Type == SymbolTokenType.Identifier) {
                 return new CompoundToken() {
                     Type = CompoundTokenType.Argument,
                     StartingLine = tokens[i].Line,
