@@ -22,6 +22,9 @@ namespace Assembler {
             } catch(UnexpectedSymbolTokenException uste) {
                 Console.WriteLine(uste.Message);
                 Environment.Exit(7);
+            } catch(UnexpectedCompoundTokenException ucte) {
+                Console.WriteLine(ucte.Message);
+                Environment.Exit(12);
             } catch(UnexpectedEofException uee) {
                 Console.WriteLine(uee.Message);
                 Environment.Exit(8);
