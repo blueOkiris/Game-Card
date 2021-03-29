@@ -62,7 +62,62 @@ namespace Assembler {
                 CompoundToken token, ref Dictionary<int, string> jumps) {
             var instBytes = new List<byte>();
             
-            
+            var cmd = (SymbolToken) token.Children[0];
+            switch(cmd.Source) {
+                case "mov":
+                    break;
+                    
+                case "add":
+                    break;
+                    
+                case "sub":
+                    break;
+                    
+                case "mul":
+                    break;
+                    
+                case "div":
+                    break;
+                    
+                case "shr":
+                    break;
+                    
+                case "shl":
+                    break;
+                    
+                case "til":
+                    break;
+                    
+                case "upd":
+                    break;
+                    
+                case "cmp":
+                    break;
+                    
+                case "del":
+                    break;
+                    
+                case "jmp":
+                    break;
+                    
+                case "je":
+                    break;
+                    
+                case "jne":
+                    break;
+                    
+                case "jgt":
+                    break;
+                    
+                case "jlt":
+                    break;
+                    
+                case "jge":
+                    break;
+                    
+                case "jle":
+                    break;
+            }
             
             return instBytes.ToArray();
         }
