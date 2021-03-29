@@ -211,6 +211,7 @@ VirtualMachine::VirtualMachine(
                 break;
             // _sprs[<register>] = { <literal>, <literal>, <literal> }
             case 0x01:
+                _clearSprite(static_cast<uint8_t>(_regs[_rom[pc]]));
                 _sprs[static_cast<uint8_t>(_regs[_rom[pc]])] = (Sprite) {
                     _rom[pc + 1], _rom[pc + 2], _rom[pc + 3]
                 };
@@ -228,6 +229,7 @@ VirtualMachine::VirtualMachine(
                 break;
             // _sprs[<reg>] = { <reg>, <literal>, <literal> }
             case 0x03:
+                _clearSprite(static_cast<uint8_t>(_regs[_rom[pc]]));
                 _sprs[static_cast<uint8_t>(_regs[_rom[pc]])] = (Sprite) {
                     static_cast<uint8_t>(_regs[_rom[pc + 1]]),
                     _rom[pc + 2],

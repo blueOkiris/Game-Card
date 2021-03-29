@@ -85,8 +85,188 @@ namespace Assembler {
                  *  - mov r <lit>, <lit>, <lit>, <lit>, <lit>
                  *  - mov r <lit>, r <lit>
                  */
-                case "mov":
-                    break;
+                case "mov": {
+                    // First get the arg list
+                    var argList = nestedArgListsToListArgs(
+                        (CompoundToken) token.Children[1]
+                    );
+                    
+                    /*
+                     * First we need to figure out what kind of move it is
+                     * Then we must check to make sure there's the correct num
+                     * of arguments
+                     * Finally parse the data and construct the command
+                     */
+                    switch(((SymbolToken) (argList[0].Children[0])).Source) {
+                        // These are only in mov
+                        case "spr": {
+                            if(argList.Count != 4) {
+                                throw new WrongNumberArgsException(
+                                    token.File, token
+                                );
+                            }
+                            
+                            var idReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[0].Children[1]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            var xReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[1]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            var yReg = 
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[2]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            var iReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[3]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            
+                            program.Add((byte) (idReg + xReg + yReg + iReg));
+                            
+                            if(idReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[0].Children[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg =
+                                    (CompoundToken) argList[0].Children[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                            if(xReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg = (CompoundToken) argList[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                            if(yReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[2]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg = (CompoundToken) argList[2];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                            if(iReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[3]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg = (CompoundToken) argList[3];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                        } break;
+                        
+                        case "spi":
+                            if(argList.Count != 2) {
+                                throw new WrongNumberArgsException(
+                                    token.File, token
+                                );
+                            }
+                            break;
+                        
+                        case "bg":
+                            if(argList.Count != 2) {
+                                throw new WrongNumberArgsException(
+                                    token.File, token
+                                );
+                            }
+                            break;
+                        
+                        // These are in mov and the other setting instructions
+                        case "spx":
+                            if(argList.Count != 2) {
+                                throw new WrongNumberArgsException(
+                                    token.File, token
+                                );
+                            }
+                            break;
+                        
+                        case "spy":
+                            if(argList.Count != 2) {
+                                throw new WrongNumberArgsException(
+                                    token.File, token
+                                );
+                            }
+                            break;
+                        
+                        case "r":
+                            if(argList.Count != 2 && argList.Count != 5) {
+                                throw new WrongNumberArgsException(
+                                    token.File, token
+                                );
+                            }
+                            break;
+                        
+                        default:
+                            throw new UnexpectedCompoundTokenException(
+                                argList[0].File, argList[0]
+                            );
+                    }
+                } break;
                 
                 /*
                  * Spr Options: NONE!!!
