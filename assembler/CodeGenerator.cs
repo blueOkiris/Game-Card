@@ -113,15 +113,15 @@ namespace Assembler {
                             var xReg =
                                 ((SymbolToken) (
                                     (CompoundToken) argList[1]
-                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                                ).Children[0]).Source == "r" ? 0x02 : 0;
                             var yReg = 
                                 ((SymbolToken) (
                                     (CompoundToken) argList[2]
-                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                                ).Children[0]).Source == "r" ? 0x04 : 0;
                             var iReg =
                                 ((SymbolToken) (
                                     (CompoundToken) argList[3]
-                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                                ).Children[0]).Source == "r" ? 0x08 : 0;
                             
                             program.Add((byte) (idReg + xReg + yReg + iReg));
                             
@@ -220,38 +220,274 @@ namespace Assembler {
                             }
                         } break;
                         
-                        case "spi":
+                        case "spi": {
                             if(argList.Count != 2) {
                                 throw new WrongNumberArgsException(
                                     token.File, token
                                 );
                             }
-                            break;
+                            
+                            var idReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[0].Children[1]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            var iReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[1]
+                                ).Children[0]).Source == "r" ? 0x02 : 0;
+                            
+                            program.Add((byte) (0x49 + idReg + iReg));
+                            
+                            if(idReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[0].Children[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg =
+                                    (CompoundToken) argList[0].Children[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                            if(iReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg = (CompoundToken) argList[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                        } break;
                         
-                        case "bg":
+                        case "bg": {
                             if(argList.Count != 2) {
                                 throw new WrongNumberArgsException(
                                     token.File, token
                                 );
                             }
-                            break;
+                            
+                            var idReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[0].Children[1]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            var iReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[1]
+                                ).Children[0]).Source == "r" ? 0x02 : 0;
+                            
+                            program.Add((byte) (0x4E + idReg + iReg));
+                            
+                            if(idReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[0].Children[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg =
+                                    (CompoundToken) argList[0].Children[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                            if(iReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg = (CompoundToken) argList[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                        } break;
                         
                         // These are in mov and the other setting instructions
-                        case "spx":
+                        case "spx": {
                             if(argList.Count != 2) {
                                 throw new WrongNumberArgsException(
                                     token.File, token
                                 );
                             }
-                            break;
+                            
+                            var idReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[0].Children[1]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            var iReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[1]
+                                ).Children[0]).Source == "r" ? 0x02 : 0;
+                            
+                            program.Add((byte) (0x10 + idReg + iReg));
+                            
+                            if(idReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[0].Children[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg =
+                                    (CompoundToken) argList[0].Children[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                            if(iReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg = (CompoundToken) argList[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                        } break;
                         
-                        case "spy":
+                        case "spy": {
                             if(argList.Count != 2) {
                                 throw new WrongNumberArgsException(
                                     token.File, token
                                 );
                             }
-                            break;
+                            
+                            var idReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[0].Children[1]
+                                ).Children[0]).Source == "r" ? 0x01 : 0;
+                            var iReg =
+                                ((SymbolToken) (
+                                    (CompoundToken) argList[1]
+                                ).Children[0]).Source == "r" ? 0x02 : 0;
+                            
+                            program.Add((byte) (0x2D + idReg + iReg));
+                            
+                            if(idReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[0].Children[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg =
+                                    (CompoundToken) argList[0].Children[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                            if(iReg == 0) {
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        (CompoundToken) argList[1]
+                                    ).Children[0]
+                                ));
+                            } else {
+                                var reg = (CompoundToken) argList[1];
+                                if(((SymbolToken) reg.Children[0]).Source
+                                        != "r") {
+                                    throw new UnexpectedCompoundTokenException(
+                                        token.File,
+                                        reg
+                                    );
+                                }
+                                
+                                program.Add(integerToByte(
+                                    (SymbolToken) (
+                                        ((CompoundToken)
+                                            reg.Children[1]).Children[0]
+                                    )
+                                ));
+                            }
+                        } break;
                         
                         case "r":
                             if(argList.Count != 2 && argList.Count != 5) {

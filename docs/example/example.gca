@@ -1,7 +1,5 @@
 include 'example-tiles.gca'
 
-    mov     spr 0, r 1, 1, r 1
-
 start:
     mov     r 1, 16
     mov     r 2, 0
