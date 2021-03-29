@@ -175,8 +175,66 @@ namespace Assembler {
                     }
                 } break;
                     
-                case "cmp":
-                    break;
+                case "cmp": {
+                    // Make sure it's just two
+                    var argList = nestedArgListsToListArgs(
+                        (CompoundToken) token.Children[1]
+                    );
+                    if(argList.Count != 2) {
+                        throw new WrongNumberArgsException(
+                            argList[0].File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Both should be registers
+                    var arg00 = argList[0].Children[0];
+                    var arg01 = argList[0].Children[1];
+                    if(argList[0].Children.Length != 2) {
+                        throw new UnexpectedCompoundTokenException(
+                            argList[0].File, argList[0]
+                        );
+                    }
+                    if(!(arg00 is SymbolToken) || !(arg01 is SymbolToken)) {
+                        throw new UnexpectedCompoundTokenException(
+                            argList[0].File, argList[0]
+                        );
+                    }
+                    if(((SymbolToken) arg00).Type != SymbolTokenType.Keyword
+                            || ((SymbolToken) arg01).Type
+                                != SymbolTokenType.Keyword) {
+                        throw new UnexpectedCompoundTokenException(
+                            argList[0].File, argList[0]
+                        );
+                    }
+                    var arg10 = argList[1].Children[0];
+                    var arg11 = argList[1].Children[1];
+                    if(argList[1].Children.Length != 2) {
+                        throw new UnexpectedCompoundTokenException(
+                            argList[1].File, argList[1]
+                        );
+                    }
+                    if(!(arg10 is SymbolToken) || !(arg11 is SymbolToken)) {
+                        throw new UnexpectedCompoundTokenException(
+                            argList[1].File, argList[1]
+                        );
+                    }
+                    if(((SymbolToken) arg10).Type != SymbolTokenType.Keyword
+                            || ((SymbolToken) arg11).Type
+                                != SymbolTokenType.Keyword) {
+                        throw new UnexpectedCompoundTokenException(
+                            argList[1].File, argList[1]
+                        );
+                    }
+                    
+                    // Get the register indices
+                    var regInd0 = integerToByte((SymbolToken) arg01);
+                    var regInd1 = integerToByte((SymbolToken) arg11);
+                    
+                    instBytes.Add(0x63);
+                    instBytes.Add(regInd0);
+                    instBytes.Add(regInd1);
+                } break;
                     
                 case "del":
                     break;
