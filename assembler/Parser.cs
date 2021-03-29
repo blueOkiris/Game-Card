@@ -53,7 +53,7 @@ namespace Assembler {
         };
         
         public static CompoundToken Parse(string inputFileName) {
-            var code = File.ReadAllText(inputFileName);
+            var code = File.ReadAllText(inputFileName).ToLower();
             var tokens = lex(code);
             
             var children = new List<Token>();
@@ -146,7 +146,7 @@ namespace Assembler {
                 
                 // Lex an integer
                 if(char.IsDigit(code[i])) {
-                    
+                    tokens.Add(lexInteger(code, ref i, line, ref pos));
                     continue;
                 }
                 
@@ -158,7 +158,117 @@ namespace Assembler {
         }
         
         // /[0-9]+/ | '0b' /[01]+/ | '0x' /[0-9a-f]+/
-        
+        private static SymbolToken lexInteger(
+                string code, ref int i, int line, ref int pos) {
+            var startPos = pos;
+            if(code[i] == '0'
+                    && i + 1 < code.Length && i + 2 < code.Length
+                    && !char.IsDigit(code[i + 1])) {
+                switch(code[i + 1]) {
+                    // '0b' /[01]+/
+                    case 'b':
+                        if(code[i + 2] != '0' && code[i + 2] != '1') {
+                            return new SymbolToken() {
+                                Type = SymbolTokenType.Integer,
+                                Line = line,
+                                Pos = pos,
+                                Source = "0"
+                            };
+                        } else {
+                            var intSrc = new StringBuilder();
+                            intSrc.Append("0b");
+                            i += 2;
+                            pos += 2;
+                            
+                            do {
+                                intSrc.Append(code[i]);
+                                i++;
+                                pos++;
+                            } while(
+                                i < code.Length
+                                && (code[i] == '0' || code[i] == '1')
+                            );
+            
+                            // Backtrack 1 bc for loop will auto increment
+                            i--;
+                            pos--;
+                            
+                            return new SymbolToken() {
+                                Type = SymbolTokenType.Integer,
+                                Line = line,
+                                Pos = startPos,
+                                Source = intSrc.ToString()
+                            };
+                        }
+                    
+                    // '0x' /[0-9a-f]/
+                    case 'x':
+                        if(!char.IsDigit(code[i + 2])
+                                && (code[i + 2] < 'a' || code[i + 2] > 'f')) {
+                            return new SymbolToken() {
+                                Type = SymbolTokenType.Integer,
+                                Line = line,
+                                Pos = pos,
+                                Source = "0"
+                            };
+                        } else {
+                            var intSrc = new StringBuilder();
+                            intSrc.Append("0b");
+                            i += 2;
+                            pos += 2;
+                            
+                            do {
+                                intSrc.Append(code[i]);
+                                i++;
+                                pos++;
+                            } while(
+                                i < code.Length
+                                && (
+                                    char.IsDigit(code[i])
+                                    && (code[i] >= 'a' && code[i] <= 'f')
+                                )
+                            );
+            
+                            // Backtrack 1 bc for loop will auto increment
+                            i--;
+                            pos--;
+                            
+                            return new SymbolToken() {
+                                Type = SymbolTokenType.Integer,
+                                Line = line,
+                                Pos = startPos,
+                                Source = intSrc.ToString()
+                            };
+                        }
+                    
+                    default:
+                        return new SymbolToken() {
+                            Type = SymbolTokenType.Integer,
+                            Line = line,
+                            Pos = pos,
+                            Source = "0"
+                        };
+                }
+            } else {
+                var intSrc = new StringBuilder();
+                do {
+                    intSrc.Append(code[i]);
+                    i++;
+                    pos++;
+                } while(i < code.Length && char.IsDigit(code[i]));
+            
+                // Backtrack 1 bc for loop after exit will auto increment
+                i--;
+                pos--;
+                
+                return new SymbolToken() {
+                    Type = SymbolTokenType.Integer,
+                    Line = line,
+                    Pos = startPos,
+                    Source = intSrc.ToString()
+                };
+            }
+        }
         
         // /[a-z_][a-z0-9_]*/
         private static SymbolToken lexIdentifier(
