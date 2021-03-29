@@ -371,7 +371,7 @@ namespace Assembler {
                             };
                         } else {
                             var intSrc = new StringBuilder();
-                            intSrc.Append("0b");
+                            intSrc.Append("0x");
                             i += 2;
                             pos += 2;
                             
@@ -383,7 +383,7 @@ namespace Assembler {
                                 i < code.Length
                                 && (
                                     char.IsDigit(code[i])
-                                    && (code[i] >= 'a' && code[i] <= 'f')
+                                    || (code[i] >= 'a' && code[i] <= 'f')
                                 )
                             );
             
