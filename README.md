@@ -35,7 +35,7 @@ The language grammar is defined here (note that case is irrelevant):
 <cmd>           ::= 'mov' | 'add' | 'sub' | 'mul' | 'div' | 'shr' | 'shl'
                   | 'til' | 'upd' | 'cmp' | 'del'
                   | 'jmp' | 'je'  | 'jne' | 'jgt' | 'jlt' | 'jge' | 'jle'
-<arg-list>      ::= <arg> { ',' <arg> }
+<arg-list>      ::= <arg> [ ',' <arg-list> ]
 <arg>           ::= 'r' <arg>   | 'bg' <arg>   | 'spr' <arg>
                   | 'spx' <arg> | 'spy' <arg> | 'spi' <arg>
                   | 'sprs' | 'map' | 'gfx' | 'inp' | <integer>

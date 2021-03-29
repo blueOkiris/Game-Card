@@ -102,8 +102,11 @@ namespace Assembler {
                     case SymbolTokenType.Identifier:
                         break;
                     
-                    // parse command
+                    // parse instruction
                     case SymbolTokenType.Command:
+                        children.Add(
+                            parseInstruction(inputFileName, tokens, ref i)
+                        );
                         break;
                     
                     default:
@@ -194,6 +197,102 @@ namespace Assembler {
             }
             
             return tokens.ToArray();
+        }
+        
+        // <cmd> <arg-list>
+        private static CompoundToken parseInstruction(
+                string inputFileName, SymbolToken[] tokens, ref int i) {
+            var children = new List<Token>();
+            children.Add(tokens[i++]);
+            if(i >= tokens.Length) {
+                throw new UnexpectedEofException(inputFileName);
+            }
+            children.Add(parseArgList(inputFileName, tokens, ref i));
+            return new CompoundToken() {
+                Type = CompoundTokenType.Instruction,
+                StartingLine = ((SymbolToken) children[0]).Line,
+                Children = children.ToArray()
+            };
+        }
+        
+        // <arg> [ ',' <arg-list> ]
+        private static CompoundToken parseArgList(
+                string inputFileName, SymbolToken[] tokens, ref int i) {
+            var children = new List<Token>();
+            children.Add(parseArgument(inputFileName, tokens, ref i));
+            if(i + 1 < tokens.Length
+                    && tokens[i + 1].Type == SymbolTokenType.Comma) {
+                i++;
+                children.Add(tokens[i++]);
+                children.Add(parseArgList(inputFileName, tokens, ref i));
+            }
+            return new CompoundToken() {
+                Type = CompoundTokenType.ArgumentList,
+                StartingLine = ((CompoundToken) children[0]).StartingLine,
+                Children = children.ToArray()
+            };
+        }
+        
+        /*
+         *   'r' <arg>   | 'bg' <arg>  | 'spr' <arg>
+         * | 'spx' <arg> | 'spy' <arg> | 'spi' <arg>
+         * | 'sprs'      | 'map'       | 'gfx' 
+         * | 'inp'       | <integer>
+         */
+        private static CompoundToken parseArgument(
+                string inputFileName, SymbolToken[] tokens, ref int i) {
+            if(tokens[i].Type != SymbolTokenType.Keyword
+                    && tokens[i].Type != SymbolTokenType.Integer) {
+                throw new UnexpectedSymbolTokenException(
+                    inputFileName, tokens[i]
+                );
+            }
+            
+            if(tokens[i].Type == SymbolTokenType.Integer) {
+                return new CompoundToken() {
+                    Type = CompoundTokenType.Argument,
+                    StartingLine = tokens[i].Line,
+                    Children = new Token[] { tokens[i] }
+                };
+            }
+            
+            switch(tokens[i].Source) {
+                // This is the one keyword that isn't part of args
+                case "include":
+                    throw new UnexpectedSymbolTokenException(
+                        inputFileName, tokens[i]
+                    );
+                
+                // These are tokens that don't take another argument
+                case "sprs":
+                case "map":
+                case "gfx":
+                case "inp":
+                    return new CompoundToken() {
+                        Type = CompoundTokenType.Argument,
+                        StartingLine = tokens[i].Line,
+                        Children = new Token[] { tokens[i] }
+                    };
+                
+                // The rest take args afterwards
+                default: {
+                    var children = new List<Token>();
+                    
+                    children.Add(tokens[i++]);
+                    if(i >= tokens.Length) {
+                        throw new UnexpectedEofException(inputFileName);
+                    }
+                    children.Add(parseArgument(
+                        inputFileName, tokens, ref i
+                    ));
+                    
+                    return new CompoundToken() {
+                        Type = CompoundTokenType.Argument,
+                        StartingLine = ((SymbolToken) children[0]).Line,
+                        Children = children.ToArray()
+                    };
+                }
+            }
         }
         
         // 'include' <string>
