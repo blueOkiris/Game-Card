@@ -1,7 +1,8 @@
 include 'example-tiles.gca'
 
 start:
-    mov     r 1, 16
+    mov     r 2, 16
+    mov     r 1, r 2
     mov     r 2, 0
 
 set_bg:

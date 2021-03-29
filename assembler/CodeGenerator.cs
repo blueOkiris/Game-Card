@@ -82,7 +82,7 @@ namespace Assembler {
                  * Bg Options: Same as spx
                  *
                  * Reg options:
-                 *  - mov r <lit>, <lit>, <lit>, <lit>, <lit>
+                 *  - mov r <lit>, <lit>
                  *  - mov r <lit>, r <lit>
                  */
                 case "mov": {
@@ -489,18 +489,79 @@ namespace Assembler {
                             }
                         } break;
                         
-                        case "r":
-                            if(argList.Count != 2 && argList.Count != 5) {
-                                throw new WrongNumberArgsException(
-                                    token.File, token
+                        case "r": {
+                            // Either integer or just one other register
+                            if(argList.Count != 2) {
+                                throw new UnexpectedCompoundTokenException(
+                                    argList[0].File, argList[0]
                                 );
                             }
-                            break;
-                        
-                        default:
-                            throw new UnexpectedCompoundTokenException(
-                                argList[0].File, argList[0]
-                            );
+                            
+                            // Make sure the other part of the argument's int
+                            var regNum = (CompoundToken) argList[0].Children[1];
+                            if(regNum.Children.Length > 1) {
+                                throw new UnexpectedCompoundTokenException(
+                                    regNum.File, regNum
+                                );
+                            }
+                            if(((SymbolToken) regNum.Children[0]).Type
+                                    != SymbolTokenType.Integer) {
+                                throw new UnexpectedSymbolTokenException(
+                                    regNum.File,
+                                    (SymbolToken) regNum.Children[0]
+                                );
+                            }
+                            
+                            // Either we're an integer, or it's another reg
+                            var nextArgStart =
+                                (SymbolToken) argList[1].Children[0];
+                            if(nextArgStart.Source == "r") {
+                                // Make sure no sub argument
+                                var regNum2 =
+                                    (CompoundToken) argList[0].Children[1];
+                                if(regNum.Children.Length > 1) {
+                                    throw new UnexpectedCompoundTokenException(
+                                        regNum2.File, regNum2
+                                    );
+                                }
+                                if(((SymbolToken) regNum2.Children[0]).Type
+                                        != SymbolTokenType.Integer) {
+                                    throw new UnexpectedSymbolTokenException(
+                                        regNum2.File,
+                                        (SymbolToken) regNum2.Children[0]
+                                    );
+                                }
+                                
+                                // Get the values
+                                var regInd0 = integerToByte(
+                                    (SymbolToken) regNum.Children[0]
+                                );
+                                var regInd1 = integerToByte(
+                                    (SymbolToken) regNum2.Children[0]
+                                );
+                                
+                                program.Add(0x56);
+                                program.Add(regInd0);
+                                program.Add(regInd1);
+                            } else if(nextArgStart.Type
+                                    == SymbolTokenType.Integer) {
+                                // Get the values
+                                var regInd0 = integerToByte(
+                                    (SymbolToken) regNum.Children[0]
+                                );
+                                var value = integerToUint32(nextArgStart);
+                                
+                                program.Add(0x55);
+                                program.Add(regInd0);
+                                foreach(var bt in value) {
+                                    program.Add(bt);
+                                }
+                            } else {
+                                throw new UnexpectedCompoundTokenException(
+                                    regNum.File, argList[0]
+                                );
+                            }
+                        } break;
                     }
                 } break;
                 
