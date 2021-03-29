@@ -56,29 +56,68 @@ namespace Assembler {
             return progArr;
         }
         
+        // Could be broken up into further methods, but not necessary
         private static void interpretInstruction(
                 CompoundToken token,
                 ref List<byte> program, ref Dictionary<int, string> jumps) {
             var cmd = (SymbolToken) token.Children[0];
             switch(cmd.Source) {
+                /*
+                 * Spr Options:
+                 *  - mov spr <lit>, <lit>, <lit>, <lit>
+                 *  - mov spr r <lit>, <lit>, <lit>, <lit>
+                 *  - mov spr <lit>, r <lit>, <lit>, <lit>
+                 *  - mov spr r <lit>, r <lit>, <lit>, <lit>
+                 *  - mov spr r <lit>, <lit>, r <lit>, <lit>
+                 *  ... Any can be <lit> or r <lit>.
+                 *
+                 * Spx Options:
+                 *  - mov spx <lit>, <lit>
+                 *  - mov spx r <lit>, <lit>
+                 *  - mov spx <lit>, r <lit>
+                 *  - mov spx r <lit>, r <lit>
+                 *
+                 * Spy Options: Same as spx
+                 * Spi Options: Same as spx
+                 * Bg Options: Same as spx
+                 *
+                 * Reg options:
+                 *  - mov r <lit>, <lit>, <lit>, <lit>, <lit>
+                 *  - mov r <lit>, r <lit>
+                 */
                 case "mov":
                     break;
-                    
+                
+                /*
+                 * Spr Options: NONE!!!
+                 * Spx Options: Same as mov
+                 * Spy Options: Same as mov
+                 * Spi Options: NONE!!!
+                 * Bg Options: NONE!!!
+                 * Reg Options: Same as mov
+                 *
+                 * So only Spx, Spy, and Reg, and they're same as mov
+                 */
                 case "add":
                     break;
-                    
+                
+                // Same options as add
                 case "sub":
                     break;
-                    
+                
+                // Same options as add
                 case "mul":
                     break;
-                    
+                
+                // Same options as add
                 case "div":
                     break;
-                    
+                
+                // Same options as add
                 case "shr":
                     break;
-                    
+                
+                // Same options as add
                 case "shl":
                     break;
                 
