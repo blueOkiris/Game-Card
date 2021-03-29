@@ -23,14 +23,11 @@ namespace Assembler {
                         labels.Add(((SymbolToken) ident).Source, program.Count);
                     } break;
                     
-                    case CompoundTokenType.Instruction: {
-                        var instBytes = interpretInstruction(
-                            (CompoundToken) token, ref jumps
+                    case CompoundTokenType.Instruction:
+                        interpretInstruction(
+                            (CompoundToken) token, ref program, ref jumps
                         );
-                        foreach(var instByte in instBytes) {
-                            program.Add(instByte);
-                        }
-                    } break;
+                        break;
                     
                     // Shouldn't happen if ast comes from parser
                     default:
@@ -59,10 +56,9 @@ namespace Assembler {
             return progArr;
         }
         
-        private static byte[] interpretInstruction(
-                CompoundToken token, ref Dictionary<int, string> jumps) {
-            var instBytes = new List<byte>();
-            
+        private static void interpretInstruction(
+                CompoundToken token,
+                ref List<byte> program, ref Dictionary<int, string> jumps) {
             var cmd = (SymbolToken) token.Children[0];
             switch(cmd.Source) {
                 case "mov":
@@ -124,9 +120,9 @@ namespace Assembler {
                     }
                     
                     // Add the correct bytes to the program
-                    instBytes.Add(0x4D);
+                    program.Add(0x4D);
                     foreach(var datum in data) {
-                        instBytes.Add(datum);
+                        program.Add(datum);
                     }
                 } break;
                 
@@ -151,19 +147,19 @@ namespace Assembler {
                     var argChild = (SymbolToken) arg.Children[0];
                     switch(argChild.Source) {
                         case "gfx":
-                            instBytes.Add(0x52);
+                            program.Add(0x52);
                             break;
                             
                         case "sprs":
-                            instBytes.Add(0x53);
+                            program.Add(0x53);
                             break;
                         
                         case "map":
-                            instBytes.Add(0x54);
+                            program.Add(0x54);
                             break;
                         
                         case "inp":
-                            instBytes.Add(0x6B);
+                            program.Add(0x6B);
                             break;
                         
                         // We should have caught it, but just in case
@@ -230,9 +226,9 @@ namespace Assembler {
                     var regInd0 = integerToByte((SymbolToken) arg01);
                     var regInd1 = integerToByte((SymbolToken) arg11);
                     
-                    instBytes.Add(0x63);
-                    instBytes.Add(regInd0);
-                    instBytes.Add(regInd1);
+                    program.Add(0x63);
+                    program.Add(regInd0);
+                    program.Add(regInd1);
                 } break;
                     
                 // Options: reg or value
@@ -254,8 +250,8 @@ namespace Assembler {
                             var ind = integerToByte(
                                 (SymbolToken) arg.Children[1]
                             );
-                            instBytes.Add(0x6D);
-                            instBytes.Add(ind);
+                            program.Add(0x6D);
+                            program.Add(ind);
                         } break;
                         
                         // We should have caught it, but just in case
@@ -265,9 +261,9 @@ namespace Assembler {
                                 var duration = integerToUint32(
                                     (SymbolToken) arg.Children[1]
                                 );
-                                instBytes.Add(0x6C);
+                                program.Add(0x6C);
                                 foreach(var b in duration) {
-                                    instBytes.Add(b);
+                                    program.Add(b);
                                 }
                             } else {
                                 throw new UnexpectedCompoundTokenException(
@@ -278,29 +274,228 @@ namespace Assembler {
                     }
                 } break;
                     
-                case "jmp":
-                    break;
+                /*
+                 * All of the jumps take the same 1 arg, so they're similar
+                 * That one argument is an identifier
+                 */
+                
+                case "jmp": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
                     
-                case "je":
-                    break;
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    var argChild = (SymbolToken) arg.Children[0];
+                    if(argChild.Type != SymbolTokenType.Identifier) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
                     
-                case "jne":
-                    break;
+                    jumps.Add(program.Count, argChild.Source);
+                    program.Add(0x64);
+                    for(int i = 0; i < 8; i++) {
+                        program.Add(0x00);
+                    }
+                } break;
                     
-                case "jgt":
-                    break;
+                case "je": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
                     
-                case "jlt":
-                    break;
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    var argChild = (SymbolToken) arg.Children[0];
+                    if(argChild.Type != SymbolTokenType.Identifier) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
                     
-                case "jge":
-                    break;
+                    jumps.Add(program.Count, argChild.Source);
+                    program.Add(0x65);
+                    for(int i = 0; i < 8; i++) {
+                        program.Add(0x00);
+                    }
+                } break;
                     
-                case "jle":
-                    break;
+                case "jne": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    var argChild = (SymbolToken) arg.Children[0];
+                    if(argChild.Type != SymbolTokenType.Identifier) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    
+                    jumps.Add(program.Count, argChild.Source);
+                    program.Add(0x6A);
+                    for(int i = 0; i < 8; i++) {
+                        program.Add(0x00);
+                    }
+                } break;
+                    
+                case "jgt": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    var argChild = (SymbolToken) arg.Children[0];
+                    if(argChild.Type != SymbolTokenType.Identifier) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    
+                    jumps.Add(program.Count, argChild.Source);
+                    program.Add(0x67);
+                    for(int i = 0; i < 8; i++) {
+                        program.Add(0x00);
+                    }
+                } break;
+                    
+                case "jlt": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    var argChild = (SymbolToken) arg.Children[0];
+                    if(argChild.Type != SymbolTokenType.Identifier) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    
+                    jumps.Add(program.Count, argChild.Source);
+                    program.Add(0x66);
+                    for(int i = 0; i < 8; i++) {
+                        program.Add(0x00);
+                    }
+                } break;
+                    
+                case "jge": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    var argChild = (SymbolToken) arg.Children[0];
+                    if(argChild.Type != SymbolTokenType.Identifier) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    
+                    jumps.Add(program.Count, argChild.Source);
+                    program.Add(0x69);
+                    for(int i = 0; i < 8; i++) {
+                        program.Add(0x00);
+                    }
+                } break;
+                    
+                case "jle": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    if(arg.Children.Length > 1) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    var argChild = (SymbolToken) arg.Children[0];
+                    if(argChild.Type != SymbolTokenType.Identifier) {
+                        throw new UnexpectedCompoundTokenException(
+                            arg.File, arg
+                        );
+                    }
+                    
+                    jumps.Add(program.Count, argChild.Source);
+                    program.Add(0x68);
+                    for(int i = 0; i < 8; i++) {
+                        program.Add(0x00);
+                    }
+                } break;
             }
-            
-            return instBytes.ToArray();
         }
         
         private static byte[] integerToUint32(SymbolToken integer) {
