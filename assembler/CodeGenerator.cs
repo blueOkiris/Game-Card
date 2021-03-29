@@ -5,8 +5,13 @@ namespace Assembler {
     public static class CodeGenerator {
         public static byte[] Generate(CompoundToken ast) {
             var program = new List<byte>();
-            var labels = new Dictionary<string, int>();
+            var labels = new Dictionary<string, ulong>();
             var jumps = new Dictionary<int, string>();
+            
+            // Add placeholder for program length
+            for(int i = 0; i < 8; i++) {
+                program.Add(0);
+            }
             
             foreach(var token in ast.Children) {
                 // Shouldn't happen if ast comes from parser
@@ -20,7 +25,9 @@ namespace Assembler {
                 switch(((CompoundToken) token).Type) {
                     case CompoundTokenType.Label: {
                         var ident = ((CompoundToken) token).Children[0];
-                        labels.Add(((SymbolToken) ident).Source, program.Count);
+                        labels.Add(
+                            ((SymbolToken) ident).Source, (ulong) program.Count
+                        );
                     } break;
                     
                     case CompoundTokenType.Instruction:
@@ -39,7 +46,6 @@ namespace Assembler {
             }
             
             // Go back and add all the correct locations for jumps
-            var progArr = program.ToArray();
             foreach(var jumpLoc in jumps) {
                 var toLoc = labels[jumpLoc.Value];
                 var toLocArr = new byte[] {
@@ -49,11 +55,22 @@ namespace Assembler {
                     (byte) (toLoc >> 8), (byte) toLoc
                 };
                 for(int i = 0; i < 8; i++) {
-                    progArr[jumpLoc.Key + 1 + i] = toLocArr[i];
+                    program[jumpLoc.Key + 1 + i] = toLocArr[i];
                 }
             }
             
-            return progArr;
+            // Insert the length at the beginning
+            var progLen = (ulong) program.Count;
+            program[7] = (byte) progLen;
+            program[6] = (byte) (progLen >> 8);
+            program[5] = (byte) (progLen >> 16);
+            program[4] = (byte) (progLen >> 24);
+            program[3] = (byte) (progLen >> 32);
+            program[2] = (byte) (progLen >> 40);
+            program[1] = (byte) (progLen >> 48);
+            program[0] = (byte) (progLen >> 56);
+            
+            return program.ToArray();
         }
         
         // Could be broken up into further methods, but not necessary
@@ -1965,11 +1982,11 @@ namespace Assembler {
                 // Options: sprs, map, gfx, or inp
                 case "upd": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2020,7 +2037,8 @@ namespace Assembler {
                     
                     // Both should be registers
                     var arg00 = argList[0].Children[0];
-                    var arg01 = argList[0].Children[1];
+                    var arg01 =
+                        ((CompoundToken) argList[0].Children[1]).Children[0];
                     if(argList[0].Children.Length != 2) {
                         throw new UnexpectedCompoundTokenException(
                             argList[0].File, argList[0]
@@ -2033,13 +2051,14 @@ namespace Assembler {
                     }
                     if(((SymbolToken) arg00).Type != SymbolTokenType.Keyword
                             || ((SymbolToken) arg01).Type
-                                != SymbolTokenType.Keyword) {
+                                != SymbolTokenType.Integer) {
                         throw new UnexpectedCompoundTokenException(
                             argList[0].File, argList[0]
                         );
                     }
                     var arg10 = argList[1].Children[0];
-                    var arg11 = argList[1].Children[1];
+                    var arg11 =
+                        ((CompoundToken) argList[1].Children[1]).Children[0];
                     if(argList[1].Children.Length != 2) {
                         throw new UnexpectedCompoundTokenException(
                             argList[1].File, argList[1]
@@ -2052,7 +2071,7 @@ namespace Assembler {
                     }
                     if(((SymbolToken) arg10).Type != SymbolTokenType.Keyword
                             || ((SymbolToken) arg11).Type
-                                != SymbolTokenType.Keyword) {
+                                != SymbolTokenType.Integer) {
                         throw new UnexpectedCompoundTokenException(
                             argList[1].File, argList[1]
                         );
@@ -2070,11 +2089,11 @@ namespace Assembler {
                 // Options: reg or value
                 case "del": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2095,7 +2114,7 @@ namespace Assembler {
                             if(((SymbolToken) argChild).Type
                                     == SymbolTokenType.Integer) {
                                 var duration = integerToUint32(
-                                    (SymbolToken) arg.Children[1]
+                                    (SymbolToken) argChild
                                 );
                                 program.Add(0x6C);
                                 foreach(var b in duration) {
@@ -2117,11 +2136,11 @@ namespace Assembler {
                 
                 case "jmp": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2148,11 +2167,11 @@ namespace Assembler {
                     
                 case "je": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2179,11 +2198,11 @@ namespace Assembler {
                     
                 case "jne": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2210,11 +2229,11 @@ namespace Assembler {
                     
                 case "jgt": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2241,11 +2260,11 @@ namespace Assembler {
                     
                 case "jlt": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2272,11 +2291,11 @@ namespace Assembler {
                     
                 case "jge": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
@@ -2303,11 +2322,11 @@ namespace Assembler {
                     
                 case "jle": {
                     // Should only have one argument
-                    var argList = (CompoundToken) token.Children[0];
+                    var argList = (CompoundToken) token.Children[1];
                     if(argList.Children.Length > 1) {
                         throw new WrongNumberArgsException(
                             argList.File,
-                            ((CompoundToken) token.Children[0])
+                            ((CompoundToken) token.Children[1])
                         );
                     }
                     
