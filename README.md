@@ -12,13 +12,23 @@ I've now moved to version 2 which utilizes the Raspberry Pi Pico, a $4 microcont
 
 ## Building
 
-To install need dependencies, (on Debian) run `make install-deps`
+For building the interpreter to run on a physical game card, the project creator, and the assembler:
 
-To build the interpreter and the game-writer project maker run `make`
+ 1. Install dotnet core 5.0
 
-To create a project for writing a game to a "ROM" chip, run `./rom-writer-pc <filename>`
+ 2. Install other needed dependencies: (on Debian) run `make install-deps`
 
-To build a .uf2 for that project once created, run `make game-writer.uf2`
+ 3. Then build the interpreter, the game-writer project maker, and the game-card assembler (gca) by running `make`
+
+For developing a game in game-card assembly:
+
+ 1. Code the game and save as a .gca file
+ 
+ 2. Build the hex code by running `gca <input-file>.gca [ -p <proj-folder> ] [ <output file> ]`
+
+ 4. To create a project for writing the game's hex file to a ROM chip, run `./rom-writer-pc <filename>.hex`
+
+ 5. Finally, to build a .uf2 for that project once created, run `make game-writer.uf2`
 
 ## Assembler Creation
 
