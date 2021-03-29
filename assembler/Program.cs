@@ -31,6 +31,9 @@ namespace Assembler {
             } catch(ArgumentOutOfRangeException aoore) {
                 Console.WriteLine(aoore.Message);
                 Environment.Exit(10);
+            } catch(WrongNumberArgsException wae) {
+                Console.WriteLine(wae.Message);
+                Environment.Exit(11);
             }
         }
         

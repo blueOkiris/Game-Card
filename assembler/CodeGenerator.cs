@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Assembler {
@@ -84,9 +85,50 @@ namespace Assembler {
                     
                 case "shl":
                     break;
+                
+                // Options: None. Everything MUST BE integers
+                case "til": {
+                    // First go from nested arg-lists to a list of args
+                    var argList = nestedArgListsToListArgs(
+                        (CompoundToken) token.Children[1]
+                    );
                     
-                case "til":
-                    break;
+                    // Make sure it's just integers
+                    foreach(var arg in argList) {
+                        var firstChild = arg.Children[0];
+                        if(!(firstChild is SymbolToken)) {
+                            throw new UnexpectedCompoundTokenException(
+                                arg.File, (CompoundToken) firstChild
+                            );
+                        }
+                        if(((SymbolToken) firstChild).Type
+                                != SymbolTokenType.Integer) {
+                            throw new UnexpectedSymbolTokenException(
+                                arg.File, (SymbolToken) firstChild
+                            );
+                        }
+                    }
+                    
+                    // Make sure there's enough data available
+                    if(argList.Count != 9) {
+                        throw new WrongNumberArgsException(
+                            argList[0].File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Convert all the numbers
+                    var data = new List<byte>();
+                    foreach(var arg in argList) {
+                        data.Add(integerToByte((SymbolToken) arg.Children[0]));
+                    }
+                    
+                    // Add the correct bytes to the program
+                    instBytes.Add(0x4D);
+                    foreach(var datum in data) {
+                        instBytes.Add(datum);
+                    }
+                } break;
                     
                 case "upd":
                     break;
@@ -120,6 +162,34 @@ namespace Assembler {
             }
             
             return instBytes.ToArray();
+        }
+        
+        private static byte integerToByte(SymbolToken integer) {
+            var value = integer.Source;
+            if(value.StartsWith("0b")) {
+                return Convert.ToByte(value.Substring(2), 2);
+            } else if(value.StartsWith("0x")) {
+                return Convert.ToByte(value.Substring(2), 16);
+            } else {
+                return byte.Parse(value);
+            }
+        }
+        
+        private static List<CompoundToken> nestedArgListsToListArgs(
+                CompoundToken argList) {
+            var args = new List<CompoundToken>();
+            args.Add((CompoundToken) argList.Children[0]);
+            
+            if(argList.Children.Length > 1) {
+                var subList = nestedArgListsToListArgs(
+                    (CompoundToken) argList.Children[2]
+                );
+                foreach(var arg in subList) {
+                    args.Add(arg);
+                }
+            }
+            
+            return args;
         }
     }
 }

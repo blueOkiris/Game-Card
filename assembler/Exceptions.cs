@@ -42,4 +42,14 @@ namespace Assembler {
                 ) {
         }
     }
+    
+    public class WrongNumberArgsException : Exception {
+        public WrongNumberArgsException(
+                string file, CompoundToken tok) :
+                base(
+                    "Error in '" + file
+                        + "':\nWrong number of arguments:\n" + tok
+                ) {
+        }
+    }
 }
