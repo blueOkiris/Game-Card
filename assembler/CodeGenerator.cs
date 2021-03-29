@@ -5,6 +5,7 @@ namespace Assembler {
         public static byte[] Generate(CompoundToken ast) {
             var program = new List<byte>();
             var labels = new Dictionary<string, int>();
+            var jumps = new Dictionary<int, string>();
             
             foreach(var token in ast.Children) {
                 // Shouldn't happen if ast comes from parser
@@ -21,6 +22,14 @@ namespace Assembler {
                         labels.Add(((SymbolToken) ident).Source, program.Count);
                     } break;
                     
+                    case CompoundTokenType.Instruction: {
+                        var instBytes = interpretInstruction(
+                            (CompoundToken) token, ref jumps
+                        );
+                        foreach(var instByte in instBytes) {
+                            program.Add(instByte);
+                        }
+                    } break;
                     
                     // Shouldn't happen if ast comes from parser
                     default:
@@ -31,7 +40,31 @@ namespace Assembler {
                 }
             }
             
-            return program.ToArray();
+            // Go back and add all the correct locations for jumps
+            var progArr = program.ToArray();
+            foreach(var jumpLoc in jumps) {
+                var toLoc = labels[jumpLoc.Value];
+                var toLocArr = new byte[] {
+                    (byte) (toLoc >> 56), (byte) (toLoc >> 48),
+                    (byte) (toLoc >> 40), (byte) (toLoc >> 32),
+                    (byte) (toLoc >> 24), (byte) (toLoc >> 16),
+                    (byte) (toLoc >> 8), (byte) toLoc
+                };
+                for(int i = 0; i < 8; i++) {
+                    progArr[jumpLoc.Key + 1 + i] = toLocArr[i];
+                }
+            }
+            
+            return progArr;
+        }
+        
+        private static byte[] interpretInstruction(
+                CompoundToken token, ref Dictionary<int, string> jumps) {
+            var instBytes = new List<byte>();
+            
+            
+            
+            return instBytes.ToArray();
         }
     }
 }

@@ -28,6 +28,9 @@ namespace Assembler {
             } catch(InvalidIncludeException iie) {
                 Console.WriteLine(iie.Message);
                 Environment.Exit(9);
+            } catch(ArgumentOutOfRangeException aoore) {
+                Console.WriteLine(aoore.Message);
+                Environment.Exit(10);
             }
         }
         
