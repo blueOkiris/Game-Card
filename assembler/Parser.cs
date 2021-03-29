@@ -41,6 +41,17 @@ namespace Assembler {
     }
     
     public static class Parser {
+        private static List<string> keywordList = new List<string>() {
+            "include", "r", "bg", "spr", "spx", "spy", "spi",
+            "sprs", "map", "gfx", "inp"
+        };
+        
+        private static List<string> cmdList = new List<string>() {
+            "mov", "add", "sub", "mul", "div", "shr", "shl",
+            "til", "upd", "cmp", "del",
+            "jmp", "je", "jne", "jgt", "jlt", "jge", "jle"
+        };
+        
         public static CompoundToken Parse(string inputFileName) {
             var code = File.ReadAllText(inputFileName);
             var tokens = lex(code);
@@ -123,7 +134,13 @@ namespace Assembler {
                 
                 // Lex a keyword, identifier, or command
                 if(char.IsLetter(code[i]) || code[i] == '_') {
-                    
+                    var ident = lexIdentifier(code, ref i, line, ref pos);
+                    if(keywordList.Contains(ident.Source)) {
+                        ident.Type = SymbolTokenType.Keyword;
+                    } else if(cmdList.Contains(ident.Source)) {
+                        ident.Type = SymbolTokenType.Command;
+                    }
+                    tokens.Add(ident);
                     continue;
                 }
                 
@@ -138,6 +155,36 @@ namespace Assembler {
             }
             
             return tokens.ToArray();
+        }
+        
+        // /[0-9]+/ | '0b' /[01]+/ | '0x' /[0-9a-f]+/
+        
+        
+        // /[a-z_][a-z0-9_]*/
+        private static SymbolToken lexIdentifier(
+                string code, ref int i, int line, ref int pos) {
+            var startPos = pos;
+            var identSrc = new StringBuilder();
+                        
+            do {
+                identSrc.Append(code[i]);
+                i++;
+                pos++;
+            } while(
+                i < code.Length
+                && (char.IsLetterOrDigit(code[i]) || code[i] == '_')
+            );
+            
+            // Backtrack 1 bc for loop after exit will auto increment
+            i--;
+            pos--;
+            
+            return new SymbolToken() {
+                Type = SymbolTokenType.Identifier,
+                Line = line,
+                Pos = startPos,
+                Source = identSrc.ToString()
+            };
         }
         
         // /'(\\.|[^\\\'])*'/
