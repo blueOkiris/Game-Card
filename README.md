@@ -4,11 +4,11 @@
 
 A credit card sized portable game console utilizing buttons, multiple games, and an i2c display
 
-## Version 1
+## Development Images
 
-Version 1 was designed for an Arduino and is essentially complete, though I never got the PCB working.
+The debug hardware looks something like this:
 
-I've now moved to version 2 which utilizes the Raspberry Pi Pico, a \$4 microcontroller that greatly overpowers my $2 ATmega328p
+![breadboarded](./docs/dev-images/v2-breadboard.jpg)
 
 ## Building
 
@@ -52,3 +52,24 @@ The language grammar is defined here (note that case is irrelevant):
 <integer>       ::= /[0-9]+/ | '0b' /[01]+/ | '0x' /[0-9a-f]+/
 <string>        ::= /'(\\.|[^\\\'])*'/
 ```
+
+## Version 1
+
+Version 1 was designed for an Arduino and is essentially complete, though I never got the PCB working.
+
+I've now moved to version 2 which utilizes the Raspberry Pi Pico, a \$4 microcontroller that greatly overpowers my $2 ATmega328p
+
+Here's some pics of the v1 development
+
+Oled running on it:
+![oled](./docs/dev-images/v1-oled-workingf.jpg)
+[Example Vid](./docs/dev-images/v1-running-example.mp4)
+
+Cartridge PCB:
+![cartridge](./docs/dev-images/v1-cartridge.jpg)
+
+Blank business-card-sized PCB:
+![blank pcb](./docs/dev-images/v1-blank.jpg)
+
+And then with everything but the buttons soldered:
+![soldered](./docs/dev-images/v1-pcb-soldered.jpg)
