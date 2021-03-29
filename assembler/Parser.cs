@@ -20,6 +20,7 @@ namespace Assembler {
         public SymbolTokenType Type;
         public int Line, Pos;
         public string Source;
+        public string File;
 
         public override string ToString() {
             var representation = new StringBuilder();
@@ -39,6 +40,7 @@ namespace Assembler {
         public CompoundTokenType Type;
         public Token[] Children;
         public int StartingLine;
+        public string File;
         
         private string toString(int indent) {
             var representation = new StringBuilder();
@@ -151,7 +153,8 @@ namespace Assembler {
             return new CompoundToken() {
                 Type = CompoundTokenType.Program,
                 Children = children.ToArray(),
-                StartingLine = 1
+                StartingLine = 1,
+                File = inputFileName
             };
         }
         
@@ -206,7 +209,9 @@ namespace Assembler {
                 
                 // Lex a keyword, identifier, or command
                 if(char.IsLetter(code[i]) || code[i] == '_') {
-                    var ident = lexIdentifier(code, ref i, line, ref pos);
+                    var ident = lexIdentifier(
+                        inputFileName, code, ref i, line, ref pos
+                    );
                     if(keywordList.Contains(ident.Source)) {
                         ident.Type = SymbolTokenType.Keyword;
                     } else if(cmdList.Contains(ident.Source)) {
@@ -218,7 +223,9 @@ namespace Assembler {
                 
                 // Lex an integer
                 if(char.IsDigit(code[i])) {
-                    tokens.Add(lexInteger(code, ref i, line, ref pos));
+                    tokens.Add(lexInteger(
+                        inputFileName, code, ref i, line, ref pos
+                    ));
                     continue;
                 }
                 
@@ -247,7 +254,8 @@ namespace Assembler {
             return new CompoundToken() {
                 Type = CompoundTokenType.Label,
                 StartingLine = ((SymbolToken) children[0]).Line,
-                Children = children.ToArray()
+                Children = children.ToArray(),
+                File = inputFileName
             };
         }
         
@@ -263,7 +271,8 @@ namespace Assembler {
             return new CompoundToken() {
                 Type = CompoundTokenType.Instruction,
                 StartingLine = ((SymbolToken) children[0]).Line,
-                Children = children.ToArray()
+                Children = children.ToArray(),
+                File = inputFileName
             };
         }
         
@@ -281,7 +290,8 @@ namespace Assembler {
             return new CompoundToken() {
                 Type = CompoundTokenType.ArgumentList,
                 StartingLine = ((CompoundToken) children[0]).StartingLine,
-                Children = children.ToArray()
+                Children = children.ToArray(),
+                File = inputFileName
             };
         }
         
@@ -306,7 +316,8 @@ namespace Assembler {
                 return new CompoundToken() {
                     Type = CompoundTokenType.Argument,
                     StartingLine = tokens[i].Line,
-                    Children = new Token[] { tokens[i] }
+                    Children = new Token[] { tokens[i] },
+                    File = inputFileName
                 };
             }
             
@@ -325,7 +336,8 @@ namespace Assembler {
                     return new CompoundToken() {
                         Type = CompoundTokenType.Argument,
                         StartingLine = tokens[i].Line,
-                        Children = new Token[] { tokens[i] }
+                        Children = new Token[] { tokens[i] },
+                        File = inputFileName
                     };
                 
                 // The rest take args afterwards
@@ -343,7 +355,8 @@ namespace Assembler {
                     return new CompoundToken() {
                         Type = CompoundTokenType.Argument,
                         StartingLine = ((SymbolToken) children[0]).Line,
-                        Children = children.ToArray()
+                        Children = children.ToArray(),
+                        File = inputFileName
                     };
                 }
             }
@@ -365,13 +378,15 @@ namespace Assembler {
             return new CompoundToken() {
                 Type = CompoundTokenType.Include,
                 StartingLine = ((SymbolToken) children[0]).Line,
-                Children = children.ToArray()
+                Children = children.ToArray(),
+                File = inputFileName
             };
         }
         
         // /[0-9]+/ | '0b' /[01]+/ | '0x' /[0-9a-f]+/
         private static SymbolToken lexInteger(
-                string code, ref int i, int line, ref int pos) {
+                string inputFileName, string code,
+                ref int i, int line, ref int pos) {
             var startPos = pos;
             if(code[i] == '0'
                     && i + 1 < code.Length && i + 2 < code.Length
@@ -384,7 +399,8 @@ namespace Assembler {
                                 Type = SymbolTokenType.Integer,
                                 Line = line,
                                 Pos = pos,
-                                Source = "0"
+                                Source = "0",
+                                File = inputFileName
                             };
                         } else {
                             var intSrc = new StringBuilder();
@@ -409,7 +425,8 @@ namespace Assembler {
                                 Type = SymbolTokenType.Integer,
                                 Line = line,
                                 Pos = startPos,
-                                Source = intSrc.ToString()
+                                Source = intSrc.ToString(),
+                                File = inputFileName
                             };
                         }
                     
@@ -421,7 +438,8 @@ namespace Assembler {
                                 Type = SymbolTokenType.Integer,
                                 Line = line,
                                 Pos = pos,
-                                Source = "0"
+                                Source = "0",
+                                File = inputFileName
                             };
                         } else {
                             var intSrc = new StringBuilder();
@@ -449,7 +467,8 @@ namespace Assembler {
                                 Type = SymbolTokenType.Integer,
                                 Line = line,
                                 Pos = startPos,
-                                Source = intSrc.ToString()
+                                Source = intSrc.ToString(),
+                                File = inputFileName
                             };
                         }
                     
@@ -458,7 +477,8 @@ namespace Assembler {
                             Type = SymbolTokenType.Integer,
                             Line = line,
                             Pos = pos,
-                            Source = "0"
+                            Source = "0",
+                            File = inputFileName
                         };
                 }
             } else {
@@ -477,14 +497,16 @@ namespace Assembler {
                     Type = SymbolTokenType.Integer,
                     Line = line,
                     Pos = startPos,
-                    Source = intSrc.ToString()
+                    Source = intSrc.ToString(),
+                    File = inputFileName
                 };
             }
         }
         
         // /[a-z_][a-z0-9_]*/
         private static SymbolToken lexIdentifier(
-                string code, ref int i, int line, ref int pos) {
+                string inputFileName, string code,
+                ref int i, int line, ref int pos) {
             var startPos = pos;
             var identSrc = new StringBuilder();
                         
@@ -505,7 +527,8 @@ namespace Assembler {
                 Type = SymbolTokenType.Identifier,
                 Line = line,
                 Pos = startPos,
-                Source = identSrc.ToString()
+                Source = identSrc.ToString(),
+                File = inputFileName
             };
         }
         
@@ -558,7 +581,8 @@ namespace Assembler {
                 Type = SymbolTokenType.String,
                 Line = startLine,
                 Pos = startPos,
-                Source = strSrc.ToString()
+                Source = strSrc.ToString(),
+                File = inputFileName
             };
         }
     }

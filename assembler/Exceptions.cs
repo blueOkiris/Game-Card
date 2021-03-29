@@ -12,9 +12,18 @@ namespace Assembler {
     }
     
     public class UnexpectedSymbolTokenException : Exception {
-        public UnexpectedSymbolTokenException(string file, Token tok) :
+        public UnexpectedSymbolTokenException(string file, SymbolToken tok) :
                 base(
                     "Error in '" + file + "':\nUnexpected token '" + tok + "'"
+                ) {
+        }
+    }
+    
+    public class UnexpectedCompoundTokenException : Exception {
+        public UnexpectedCompoundTokenException(
+                string file, CompoundToken tok) :
+                base(
+                    "Error in '" + file + "':\nUnexpected token:\n" + tok
                 ) {
         }
     }

@@ -10,7 +10,6 @@ namespace Assembler {
             
             try {
                 var ast = Parser.Parse(fileNames.Item1);
-                Console.WriteLine(ast);
                 var code = CodeGenerator.Generate(ast);
                 File.WriteAllBytes(fileNames.Item2, code);
             } catch(IOException ioe) {
