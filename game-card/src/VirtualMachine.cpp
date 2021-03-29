@@ -1057,6 +1057,7 @@ VirtualMachine::VirtualMachine(
             /*
              * Delay in ms
              */
+            // sleep_ms(<lit>)
             case 0x6C:
                 sleep_ms(
                     (static_cast<uint32_t>(_rom[pc]) << 24)
@@ -1065,6 +1066,11 @@ VirtualMachine::VirtualMachine(
                     + static_cast<uint32_t>(_rom[pc + 3])
                 );
                 pc += 4;
+                break;
+            // sleep_ms(<reg>)
+            case 0x6D:
+                sleep_ms(_regs[_rom[pc]]);
+                pc++;
                 break;
         }
     }

@@ -38,6 +38,7 @@ move_spr:
     
     ; Either add 1 or add 0
     add     r 2, r 3
+    del     100
     
     jmp     move_spr
 
