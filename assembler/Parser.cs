@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -56,6 +57,11 @@ namespace Assembler {
             var code = File.ReadAllText(inputFileName).ToLower();
             var tokens = lex(code);
             
+            // Debug print
+            foreach(var token in tokens) {
+                Console.WriteLine(token);
+            }
+            
             var children = new List<Token>();
             
             // { <inst> | <label> | <include> }
@@ -105,6 +111,15 @@ namespace Assembler {
                     case '\r':
                         continue;
                     
+                    // Comments
+                    case ';':
+                        while(i < code.Length && code[i] != '\n') {
+                            i++;
+                        }
+                        pos = 0;
+                        line++;
+                        continue;
+                    
                     // Keep track of new lines though
                     case '\n':
                         pos = 0;
@@ -126,7 +141,7 @@ namespace Assembler {
                         
                     case ':':
                         tokens.Add(new SymbolToken() {
-                            Type = SymbolTokenType.Comma,
+                            Type = SymbolTokenType.Colon,
                             Line = line, Pos = pos, Source = ":"
                         });
                         continue;
