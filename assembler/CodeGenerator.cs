@@ -148,7 +148,6 @@ namespace Assembler {
                             arg.File, arg
                         );
                     }
-                    
                     var argChild = (SymbolToken) arg.Children[0];
                     switch(argChild.Source) {
                         case "gfx":
@@ -236,8 +235,48 @@ namespace Assembler {
                     instBytes.Add(regInd1);
                 } break;
                     
-                case "del":
-                    break;
+                // Options: reg or value
+                case "del": {
+                    // Should only have one argument
+                    var argList = (CompoundToken) token.Children[0];
+                    if(argList.Children.Length > 1) {
+                        throw new WrongNumberArgsException(
+                            argList.File,
+                            ((CompoundToken) token.Children[0])
+                        );
+                    }
+                    
+                    // Make sure it's a valid argument
+                    var arg = (CompoundToken) argList.Children[0];
+                    var argChild = (SymbolToken) arg.Children[0];
+                    switch(argChild.Source) {
+                        case "r": {
+                            var ind = integerToByte(
+                                (SymbolToken) arg.Children[1]
+                            );
+                            instBytes.Add(0x6D);
+                            instBytes.Add(ind);
+                        } break;
+                        
+                        // We should have caught it, but just in case
+                        default:
+                            if(((SymbolToken) argChild).Type
+                                    == SymbolTokenType.Integer) {
+                                var duration = integerToUint32(
+                                    (SymbolToken) arg.Children[1]
+                                );
+                                instBytes.Add(0x6C);
+                                foreach(var b in duration) {
+                                    instBytes.Add(b);
+                                }
+                            } else {
+                                throw new UnexpectedCompoundTokenException(
+                                    arg.File, arg
+                                );
+                            }
+                            break;
+                    }
+                } break;
                     
                 case "jmp":
                     break;
@@ -262,6 +301,22 @@ namespace Assembler {
             }
             
             return instBytes.ToArray();
+        }
+        
+        private static byte[] integerToUint32(SymbolToken integer) {
+            var value = integer.Source;
+            UInt32 parsed;
+            if(value.StartsWith("0b")) {
+                parsed = Convert.ToUInt32(value.Substring(2), 2);
+            } else if(value.StartsWith("0x")) {
+                parsed = Convert.ToUInt32(value.Substring(2), 16);
+            } else {
+                parsed = UInt32.Parse(value);
+            }
+            return new byte[] {
+                (byte) (parsed >> 24), (byte) (parsed >> 16),
+                (byte) (parsed >> 8), (byte) parsed
+            };
         }
         
         private static byte integerToByte(SymbolToken integer) {
