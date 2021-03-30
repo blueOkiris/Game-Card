@@ -10,6 +10,10 @@ The debug hardware looks something like this:
 
 ![breadboarded](./docs/dev-images/v2-breadboard.jpg)
 
+The design for the PCB looks like this:
+
+![v2 pcb](./docs/dev-images/v2-pcb-design.png)
+
 ## Building
 
 For building the interpreter to run on a physical game card, the project creator, and the assembler:
