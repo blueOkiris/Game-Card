@@ -14,6 +14,10 @@ The design for the PCB looks like this:
 
 ![v2 pcb](./docs/dev-images/v2-pcb-design.png)
 
+And the design for ROM PCBs looks like this:
+
+![v2 rom pcb](./docs/dev-images/v2-cartridge-pcb.png)
+
 ## Building
 
 For building the interpreter to run on a physical game card, the project creator, and the assembler:
