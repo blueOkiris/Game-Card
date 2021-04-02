@@ -84,7 +84,7 @@ uint64_t M23a1024::size() const {
     return 128 * 1024;
 }
 
-M23lc512::M23lc512() {
+M25lc512::M25lc512() {
     // Initialize spi
     spi_init(SPI_PORT, SPI_SPEED);
     
@@ -109,7 +109,7 @@ M23lc512::M23lc512() {
     gpio_put(PIN_CS, 1);
 }
 
-void M23lc512::write(
+void M25lc512::write(
         const uint32_t addr, const uint8_t *buff, const int len) const {
     uint16_t currAddr = static_cast<uint16_t>(addr);
     
@@ -132,7 +132,7 @@ void M23lc512::write(
     }
 }
 
-void M23lc512::read(
+void M25lc512::read(
         const uint32_t addr, uint8_t *buff, const int len) const {
     uint16_t currAddr = static_cast<uint16_t>(addr);
     
@@ -152,14 +152,14 @@ void M23lc512::read(
     }
 }
 
-void M23lc512::_wren() const {
+void M25lc512::_wren() const {
     uint8_t cmd = M25LC512_WREN;
     gpio_put(PIN_CS, 0);
     spi_write_blocking(SPI_PORT, &cmd, 1);
     gpio_put(PIN_CS, 1);
 }
 
-uint64_t M23lc512::size() const {
+uint64_t M25lc512::size() const {
     return 64 * 1024;
 }
 

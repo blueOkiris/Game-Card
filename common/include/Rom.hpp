@@ -68,12 +68,12 @@ namespace gamecard {
     };
     
     // Eeprom implementation of game ROM (Similar to above, but non-volatile)
-    class M23lc512 : public RomChip {
+    class M25lc512 : public RomChip {
         private:
             void _wren() const;
         
         public:
-            M23lc512();
+            M25lc512();
             void write(
                 const uint32_t addr, const uint8_t *buff, const int len
             ) const override;
