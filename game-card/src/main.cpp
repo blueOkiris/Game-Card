@@ -23,15 +23,16 @@ int main() {
     
     //testHardware();
     //testHardwareMulticore();
+    testRom();
     //testReadRom();
     
-    printf("Connecting to hardware\n");
-    const Ssd1306 oled;
-    const ButtonController cont;
-    const M25lc512 rom;
+    //printf("Connecting to hardware\n");
+    //const Ssd1306 oled;
+    //const ButtonController cont;
+    //const M25lc512 rom;
     
-    printf("Starting virtual machine\n");
-    const VirtualMachine vm(oled, cont, rom);
+   // printf("Starting virtual machine\n");
+    //const VirtualMachine vm(oled, cont, rom);
     
     return 0;
 }
@@ -75,24 +76,23 @@ void testHardwareMulticoreCore1() {
     testButtons();
 }
 
-// Write 0-100 in the SRAM and then read 0-100 back
 void testRom() {
-    const M23a1024 ram;
+    const M25lc512 rom;
     
-    printf("Writing 0-5 to SRAM\n");
+    printf("Writing 0-5 to ROM\n");
     uint8_t buff[5];
     for(int i = 0; i < 5; i++) {
         buff[i] = i;
     }
-    ram.write(0, buff, 5);
+    rom.write(0, buff, 5);
     sleep_ms(1000);
 
     for(int i = 0; i < 5; i++) {
         buff[i] = 0;
     }
     
-    printf("Reading 0-5 from SRAM\n");
-    ram.read(0, buff, 5);
+    printf("Reading 0-5 from ROM\n");
+    rom.read(0, buff, 5);
     for(int i = 0; i < 5; i++) {
         printf("%d\n", buff[i]);
     }

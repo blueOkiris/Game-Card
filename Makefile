@@ -66,7 +66,7 @@ $(WR_PC_OBJNAME) : /tmp/pico-sdk $(WR_PC_SRC)
 		$(WR_PC_PROJFOLDER)/bin/Release/net5.0/$(WR_PC_ARCH)/publish/pc \
 		$(WR_PC_OBJNAME)
 
-game-writer.uf2 : /tmp/pico-sdk $(WR_PC_OBJNAME) writer-proj/*
+game-writer.uf2 : /tmp/pico-sdk $(WR_PC_OBJNAME) writer-proj/* $(wildcard common/include/*.hpp) $(wildcard common/src/*.cpp)
 	mkdir -p writer-proj/build
 	cd writer-proj/build; PICO_SDK_PATH=/tmp/pico-sdk cmake ..
 	cd writer-proj/build; make

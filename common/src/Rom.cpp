@@ -102,11 +102,6 @@ M25lc512::M25lc512() {
     gpio_put(PIN_CS, 0);
     sleep_ms(50);
     gpio_put(PIN_CS, 1);
-    
-    uint8_t cmd[2] = { M25LC512_WRSR, 0x00 };
-    gpio_put(PIN_CS, 0);
-    spi_write_blocking(SPI_PORT, cmd, 2);
-    gpio_put(PIN_CS, 1);
 }
 
 void M25lc512::write(
@@ -117,8 +112,9 @@ void M25lc512::write(
     uint8_t cmd[4];
     cmd[0] = M25LC512_WRITE;
     
+    _wren();
+    
     for(int i = 0; i < len; i++) {
-        _wren();
         
         inst.val = currAddr++;
         cmd[1] = inst.nlsb;

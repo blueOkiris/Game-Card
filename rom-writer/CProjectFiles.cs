@@ -39,7 +39,7 @@ int main() {
     
     printf(" + "\"Welcome to game writer!\\n\"" + @");
     
-    const M23a1024 rom;
+    const M25lc512 rom;
     
     printf(" + "\"Writing game code to chip...\\n\"" + @");
     for(int i = 0; i < GAME_FILE_LEN; i++) {
