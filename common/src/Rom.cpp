@@ -1,3 +1,4 @@
+#include <vector>
 #include <stdio.h>
 #include <pico/stdlib.h>
 #include <hardware/spi.h>
@@ -102,54 +103,66 @@ M25lc512::M25lc512() {
     gpio_put(PIN_CS, 0);
     sleep_ms(50);
     gpio_put(PIN_CS, 1);
+    
+    _wren();
+    uint8_t cmd[2] = { M25LC512_WRSR, 0 };
+    gpio_put(PIN_CS, 0);
+    spi_write_blocking(SPI_PORT, cmd, 2);
+    gpio_put(PIN_CS, 1);
+    
+    uint8_t cmd2 = M25LC512_RDSR;
+    uint8_t data = 0;
+    gpio_put(PIN_CS, 0);
+    spi_write_blocking(SPI_PORT, &cmd2, 1);
+    spi_read_blocking(SPI_PORT, 0, &data, 1);
+    gpio_put(PIN_CS, 1);
+    printf("Status register: %x\n", data);
 }
 
 void M25lc512::write(
         const uint32_t addr, const uint8_t *buff, const int len) const {
-    uint16_t currAddr = static_cast<uint16_t>(addr);
-    
-    Instruction inst;
-    uint8_t cmd[4];
-    cmd[0] = M25LC512_WRITE;
-    
-    _wren();
-    
+    auto currAddr = static_cast<uint16_t>(addr);
+    uint8_t cmd[4] = { M25LC512_WRITE, 0, 0, 0 };
     for(int i = 0; i < len; i++) {
-        
-        inst.val = currAddr++;
-        cmd[1] = inst.nlsb;
-        cmd[2] = inst.lsb;
-        
+        cmd[1] = static_cast<uint8_t>(currAddr >> 8);
+        cmd[2] = static_cast<uint8_t>(currAddr);
         cmd[3] = buff[i];
         
+        _wren();
         gpio_put(PIN_CS, 0);
         spi_write_blocking(SPI_PORT, cmd, 4);
         gpio_put(PIN_CS, 1);
+        //_wrdi();
+        currAddr++;
     }
 }
 
 void M25lc512::read(
         const uint32_t addr, uint8_t *buff, const int len) const {
-    uint16_t currAddr = static_cast<uint16_t>(addr);
-    
-    Instruction inst;
-    uint8_t cmd[3];
-    cmd[0] = M25LC512_READ;
-    
+    auto currAddr = static_cast<uint16_t>(addr);
+    uint8_t cmd[3] = { M25LC512_READ, 0, 0 };
     for(int i = 0; i < len; i++) {
-        inst.val = currAddr++;
-        cmd[1] = inst.nlsb;
-        cmd[2] = inst.lsb;
+        cmd[1] = static_cast<uint8_t>(currAddr >> 8);
+        cmd[2] = static_cast<uint8_t>(currAddr);
         
+        _wren();
         gpio_put(PIN_CS, 0);
         spi_write_blocking(SPI_PORT, cmd, 3);
-        spi_read_blocking(SPI_PORT, 0xFF, buff + i, 1);
+        spi_read_blocking(SPI_PORT, 0x00, buff + i, 1);
         gpio_put(PIN_CS, 1);
+        currAddr++;
     }
 }
 
 void M25lc512::_wren() const {
     uint8_t cmd = M25LC512_WREN;
+    gpio_put(PIN_CS, 0);
+    spi_write_blocking(SPI_PORT, &cmd, 1);
+    gpio_put(PIN_CS, 1);
+}
+
+void M25lc512::_wrdi() const {
+    uint8_t cmd = M25LC512_WRDI;
     gpio_put(PIN_CS, 0);
     spi_write_blocking(SPI_PORT, &cmd, 1);
     gpio_put(PIN_CS, 1);

@@ -80,11 +80,14 @@ void testRom() {
     const M25lc512 rom;
     
     printf("Writing 0-5 to ROM\n");
-    uint8_t buff[5];
-    for(int i = 0; i < 5; i++) {
+    uint8_t buff[200];
+    for(int i = 0; i < 200; i++) {
         buff[i] = i;
     }
-    rom.write(0, buff, 5);
+    for(int i = 0; i < 200; i++) {
+        rom.write(i, buff + i, 1);
+    }
+    printf("Done.\n");
     sleep_ms(1000);
 
     for(int i = 0; i < 5; i++) {
@@ -92,12 +95,12 @@ void testRom() {
     }
     
     printf("Reading 0-5 from ROM\n");
-    rom.read(0, buff, 5);
-    for(int i = 0; i < 5; i++) {
-        printf("%d\n", buff[i]);
+    rom.read(0, buff, 200);
+    for(int i = 0; i < 200; i++) {
+        printf("%d ", buff[i]);
     }
     
-    printf("Done.\n");
+    printf("\nDone.\n");
 }
 
 // Reads and prints button states in a loop

@@ -27,7 +27,9 @@
 #define M25LC512_READ   0x03
 #define M25LC512_WRITE  0x02
 #define M25LC512_WREN   0x06
+#define M25LC512_WRDI   0x04
 #define M25LC512_WRSR   0x01
+#define M25LC512_RDSR   0x05
 
 namespace gamecard {
     union Instruction {
@@ -71,6 +73,7 @@ namespace gamecard {
     class M25lc512 : public RomChip {
         private:
             void _wren() const;
+            void _wrdi() const;
         
         public:
             M25lc512();
