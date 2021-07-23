@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <TinyWireM.h>
-#include <Display.hpp>
+#include <GameCardDisplay.hpp>
 
 using namespace gamecard;
 

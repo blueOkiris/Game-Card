@@ -1,4 +1,4 @@
-#include <Display.hpp>
+#include <GameCardDisplay.hpp>
 
 void setup() {
     const gamecard::Ssd1306 oled;
