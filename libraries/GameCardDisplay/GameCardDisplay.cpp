@@ -1,3 +1,9 @@
+/*
+ * Author: Dylan Turner
+ * Description:
+ *  - Code for Ssd1306 display implementation.
+ *  - Note: requires TinyWireM library!
+ */
 #include <Arduino.h>
 #include <TinyWireM.h>
 #include <GameCardDisplay.hpp>
