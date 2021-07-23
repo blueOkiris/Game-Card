@@ -1,7 +1,8 @@
 /*
- * This file defines the representations of the SSD1306 I2C Oled device
- * It also provides a list of all the various necessary commands
- * for drawig to the display
+ * Author: Dylan Turner
+ * Description:
+ *  - Defines a display interface that can be used by any program
+ *  - Includes SSD1306 128x64 OLED implementation of said display interface
  */
 #pragma once
 
