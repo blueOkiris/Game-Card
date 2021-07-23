@@ -27,3 +27,4 @@ __Set up Libraries:__
 
 1) Download the TinyWireM library from: https://github.com/adafruit/TinyWireM
 2) Install it to your Arduino's libraries folder
+3) Copy the folders in the repo's libraries/ subdirectory to your Arduino libraries folder
