@@ -4,80 +4,11 @@
 
 A credit card sized portable game console utilizing buttons, multiple games, and an i2c display
 
-## Development Images
+## Design
 
-The debug hardware looks something like this:
+The Game Card itself is nothing but a shell containing the I2C display and buttons.
+Each game can then utilize the hardware how it likes and in the most efficient way possible.
 
-![breadboarded](./docs/dev-images/v2-breadboard.jpg)
+The original cartridges use ATtiny84As as the brains and ROM.
 
-The design for the PCB looks like this:
-
-![v2 pcb](./docs/dev-images/v2-pcb-design.png)
-
-And the design for ROM PCBs looks like this:
-
-![v2 rom pcb](./docs/dev-images/v2-cartridge-pcb.png)
-
-## Building
-
-For building the interpreter to run on a physical game card, the project creator, and the assembler:
-
- 1. Install dotnet core 5.0
-
- 2. Install other needed dependencies: (on Debian) run `make install-deps`
-
- 3. Then build the interpreter, the game-writer project maker, and the game-card assembler (gca) by running `make`
-
-For developing a game in game-card assembly:
-
- 1. Code the game and save as a .gca file
- 
- 2. Build the hex code by running `gca <input-file>.gca [ -p <proj-folder> ] [ <output file> ]`
-
- 4. To create a project for writing the game's hex file to a ROM chip, run `./rom-writer-pc <filename>.hex`
-
- 5. Finally, to build a .uf2 for that project once created, run `make game-writer.uf2`
-
-## Assembler Creation
-
-There is an assembler, and it needs a parser
-
-The language grammar is defined here (note that case is irrelevant):
-
-```
-<program>       ::= { <inst> | <label> | <include> }
-<label>         ::= <ident> ':'
-<inst>          ::= <cmd> <arg-list>
-<include>       ::= 'include' <string>
-<ident>         ::= /[a-z_][a-z0-9_]*/
-<cmd>           ::= 'mov' | 'add' | 'sub' | 'mul' | 'div' | 'shr' | 'shl'
-                  | 'til' | 'upd' | 'cmp' | 'del'
-                  | 'jmp' | 'je'  | 'jne' | 'jgt' | 'jlt' | 'jge' | 'jle'
-<arg-list>      ::= <arg> [ ',' <arg-list> ]
-<arg>           ::= 'r' <arg>   | 'bg' <arg>   | 'spr' <arg>
-                  | 'spx' <arg> | 'spy' <arg> | 'spi' <arg>
-                  | 'sprs' | 'map' | 'gfx' | 'inp' | <integer>
-<integer>       ::= /[0-9]+/ | '0b' /[01]+/ | '0x' /[0-9a-f]+/
-<string>        ::= /'(\\.|[^\\\'])*'/
-```
-
-## Version 1
-
-Version 1 was designed for an Arduino and is essentially complete, though I never got the PCB working.
-
-I've now moved to version 2 which utilizes the Raspberry Pi Pico, a \$4 microcontroller that greatly overpowers my $2 ATmega328p
-
-Here's some pics of the v1 development
-
-Oled running on it:
-![oled](./docs/dev-images/v1-oled-workingf.jpg)
-[Example Vid](./docs/dev-images/v1-running-example.mp4)
-
-Cartridge PCB:
-![cartridge](./docs/dev-images/v1-cartridge.jpg)
-
-Blank business-card-sized PCB:
-![blank pcb](./docs/dev-images/v1-blank.jpg)
-
-And then with everything but the buttons soldered:
-![soldered](./docs/dev-images/v1-pcb-soldered.jpg)
+Included in this repo are games designed for the system as well as header-only libraries utilizable by the various applications.
