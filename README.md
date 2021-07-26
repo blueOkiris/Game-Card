@@ -13,6 +13,23 @@ The original cartridges use ATtiny84As as the brains and ROM.
 
 Included in this repo are games designed for the system as well as header-only libraries utilizable by the various applications.
 
+__OLED Display Connection__
+
+The OLED display is connected through the two designated I2C pins on the ATtiny84A.
+These are pins 4 (SCL) and 6 (SDA) in Arduino code or 7 and 9 on the actual device.
+
+They are also the 5th and 6th pins on the PCB port if counting from right to left.
+
+__Button Connection__
+
+The buttons are wired in the following order:
+ - B - 3rd pin from the right on PCB (first 2 are GND then VCC) which corresponds to Arduino pin 10/ATtiny pin B0
+ - A - 4th pin from the right on PCB corresponding to Arduino 9/ATtiny B1
+ - Up - 7th pin from the right on PCB/Arduino 8/B2
+ - Down - 8th pin from the right on PCB/Arduino 9/B2
+ - Left - 9th pin from the right on PCB/Arduino 5/A5
+ - Right - Last pin from the right on PCB/Arduino 0/A0
+
 ## Dependencies
 
 This is how to set up your dev environment to be able to get these programs to your game cartridges.
@@ -25,6 +42,5 @@ __Set up ATtiny84:__
 
 __Set up Libraries:__
 
-1) Download the TinyWireM library from: https://github.com/adafruit/TinyWireM
-2) Install it to your Arduino's libraries folder
-3) Copy the folders in the repo's libraries/ subdirectory to your Arduino libraries folder
+1) Download the SoftwareWire library from the library manager
+2) Copy the folders in the repo's libraries/ subdirectory to your Arduino libraries folder

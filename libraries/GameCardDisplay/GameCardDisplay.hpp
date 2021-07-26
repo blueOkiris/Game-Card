@@ -7,7 +7,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <TinyWireM.h>
+#include <SoftwareWire.h>
 
 // Oled driver commands
 #define SSD_CMD_SET_CONTRAST    0x81
@@ -62,6 +62,7 @@ namespace gamecard {
     // Oled implementation of a display
     class Ssd1306 : public Display {
         private:
+            const SoftwareWire _wire;
             void _command(const uint8_t cmd) const;
             
         public:

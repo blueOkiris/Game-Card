@@ -7,7 +7,9 @@
 
 void setup() {
     const gamecard::Ssd1306 oled;
-    oled.test();
+    while(true) {
+        oled.test();
+    }
 }
 
 void loop() {

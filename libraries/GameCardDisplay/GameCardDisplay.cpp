@@ -2,24 +2,24 @@
  * Author: Dylan Turner
  * Description:
  *  - Code for Ssd1306 display implementation.
- *  - Note: requires TinyWireM library!
+ *  - Note: requires SoftwareWire library!
  */
 #include <Arduino.h>
-#include <TinyWireM.h>
+#include <SoftwareWire.h>
 #include <GameCardDisplay.hpp>
 
 using namespace gamecard;
 
 void Ssd1306::_command(const uint8_t cmd) const {
-    TinyWireM.beginTransmission(SSD_I2C_ADDR);
-    TinyWireM.send(SSD_CTRL);
-    TinyWireM.send(cmd);
-    TinyWireM.endTransmission();
+    _wire.beginTransmission(SSD_I2C_ADDR);
+    _wire.write(SSD_CTRL);
+    _wire.write(cmd);
+    _wire.endTransmission();
 }
 
-Ssd1306::Ssd1306() {
+Ssd1306::Ssd1306() : _wire(6, 4) {
     // Initialize i2c
-    TinyWireM.begin();
+    _wire.begin();
     
     // Send correct commands to display to init
     _command(SSD_CMD_DISP_OFF);             // command 
@@ -59,18 +59,18 @@ void Ssd1306::fill(const bool isClear) const {
             SSD_CMD_SET_PAGE_ADDR, 0, (SSD_SCREEN_HEIGHT >> 3) - 1,
         SSD_CTRL, SSD_CMD_SET_COL_ADDR, 0, SSD_SCREEN_WIDTH - 1
     };
-    TinyWireM.beginTransmission(SSD_I2C_ADDR);
+    _wire.beginTransmission(SSD_I2C_ADDR);
     for(int i = 0; i < 8; i++) {
-        TinyWireM.send(topLeftMove[i]);
+        _wire.write(topLeftMove[i]);
     }
-    TinyWireM.endTransmission();
+    _wire.endTransmission();
     
     // Make everything black
     for(int i = 0; i < 1024; i++) {
-        TinyWireM.beginTransmission(SSD_I2C_ADDR);
-        TinyWireM.send(SSD_DATA);
-        TinyWireM.send(color);
-        TinyWireM.endTransmission();
+        _wire.beginTransmission(SSD_I2C_ADDR);
+        _wire.write(SSD_DATA);
+        _wire.write(color);
+        _wire.endTransmission();
     }
 }
 
@@ -86,18 +86,18 @@ void Ssd1306::putTile(
         static_cast<uint8_t>(120 - (tileX << 3)),
         static_cast<uint8_t>(127 - (tileX << 3))
     };
-    TinyWireM.beginTransmission(SSD_I2C_ADDR);
+    _wire.beginTransmission(SSD_I2C_ADDR);
     for(int i = 0; i < 8; i++) {
-        TinyWireM.send(positionCmd[i]);
+        _wire.write(positionCmd[i]);
     }
-    TinyWireM.endTransmission();
+    _wire.endTransmission();
     
     // Draw the tile
     for(int i = 7; i >= 0; i--) {
-        TinyWireM.beginTransmission(SSD_I2C_ADDR);
-        TinyWireM.send(SSD_DATA);
-        TinyWireM.send(data[i]);
-        TinyWireM.endTransmission();
+        _wire.beginTransmission(SSD_I2C_ADDR);
+        _wire.write(SSD_DATA);
+        _wire.write(data[i]);
+        _wire.endTransmission();
     }
 }
 
