@@ -17,8 +17,9 @@ void Ssd1306::_command(const uint8_t cmd) const {
     _wire.endTransmission();
 }
 
-Ssd1306::Ssd1306() : _wire(6, 4) {
+void Ssd1306::init(void) const {
     // Initialize i2c
+    _wire = SoftwareWire(6, 4);
     _wire.begin();
     
     // Send correct commands to display to init

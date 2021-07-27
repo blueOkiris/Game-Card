@@ -26,9 +26,13 @@ The buttons are wired in the following order:
  - B - 3rd pin from the right on PCB (first 2 are GND then VCC) which corresponds to Arduino pin 10/ATtiny pin B0
  - A - 4th pin from the right on PCB corresponding to Arduino 9/ATtiny B1
  - Up - 7th pin from the right on PCB/Arduino 8/B2
- - Down - 8th pin from the right on PCB/Arduino 9/B2
+ - Down - 8th pin from the right on PCB/Arduino 7/A7
  - Left - 9th pin from the right on PCB/Arduino 5/A5
  - Right - Last pin from the right on PCB/Arduino 0/A0
+
+Note that A and B are pulled down, but U/D/L/R are all pulled up, so they're inverted!
+
+Just use the library though and you'll be fine :)
 
 ## Dependencies
 

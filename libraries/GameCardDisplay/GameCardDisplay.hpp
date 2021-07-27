@@ -48,6 +48,8 @@
 namespace gamecard {
     class Display {
         public:
+            virtual void init(void) const = 0;
+
             virtual void fill(const bool isClear) const = 0;
             virtual void putTile(
                 const uint8_t data[8],
@@ -62,11 +64,11 @@ namespace gamecard {
     // Oled implementation of a display
     class Ssd1306 : public Display {
         private:
-            const SoftwareWire _wire;
+            SoftwareWire _wire;
             void _command(const uint8_t cmd) const;
             
         public:
-            Ssd1306();
+            void init(void) const override;
             
             void fill(const bool isClear) const override;
             void putTile(
