@@ -5,8 +5,10 @@
 
 #include <GameCardDisplay.hpp>
 
+const gamecard::Ssd1306 oled;
+
 void setup() {
-    const gamecard::Ssd1306 oled;
+    oled.init();
     while(true) {
         oled.test();
     }
