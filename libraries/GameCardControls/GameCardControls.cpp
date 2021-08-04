@@ -9,8 +9,8 @@
 using namespace gamecard;
 
 void ButtonController::init(void) const {
-    pinMode(BTN_CONT_A, INPUT);
-    pinMode(BTN_CONT_B, INPUT);
+    pinMode(BTN_CONT_HIGH, INPUT);
+    pinMode(BTN_CONT_LOW, INPUT);
     pinMode(BTN_CONT_UP, INPUT);
     pinMode(BTN_CONT_DOWN, INPUT);
     pinMode(BTN_CONT_LEFT, INPUT);
@@ -20,11 +20,11 @@ void ButtonController::init(void) const {
 bool ButtonController::isInputPressed(const Input input) const {
     // Only thing to note is that U/D/L/R are all inverted
     switch(input) {
-        case Input::A:
-            return digitalRead(BTN_CONT_A);
+        case Input::High:
+            return digitalRead(BTN_CONT_HIGH);
         
-        case Input::B:
-            return digitalRead(BTN_CONT_B);
+        case Input::Low:
+            return digitalRead(BTN_CONT_LOW);
         
         case Input::Up:
             return !digitalRead(BTN_CONT_UP);

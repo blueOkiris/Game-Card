@@ -23,8 +23,8 @@ They are also the 5th and 6th pins on the PCB port if counting from right to lef
 __Button Connection__
 
 The buttons are wired in the following order:
- - B - 3rd pin from the right on PCB (first 2 are GND then VCC) which corresponds to Arduino pin 10/ATtiny pin B0
- - A - 4th pin from the right on PCB corresponding to Arduino 9/ATtiny B1
+ - Lower Button - 3rd pin from the right on PCB (first 2 are GND then VCC) which corresponds to Arduino pin 10/ATtiny pin B0
+ - Higher Button - 4th pin from the right on PCB corresponding to Arduino 9/ATtiny B1
  - Up - 7th pin from the right on PCB/Arduino 8/B2
  - Down - 8th pin from the right on PCB/Arduino 7/A7
  - Left - 9th pin from the right on PCB/Arduino 5/A5
