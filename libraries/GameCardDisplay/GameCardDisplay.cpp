@@ -155,7 +155,7 @@ void Ssd1306::putOffsetTile(
     putTile(quadTile[3], topLeftX + 1, (topLeftY >> 3) + 1);
 }
 
-void Ssd1306::test() const {
+void Ssd1306::test(void) const {
     // Fill the screen 4 times as fast as possible
     for(int i = 0; i < 4; i++) {
         fill(true);        

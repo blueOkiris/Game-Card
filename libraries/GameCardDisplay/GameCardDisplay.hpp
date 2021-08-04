@@ -81,6 +81,6 @@ namespace gamecard {
                 const uint8_t bgTiles[4][8]
             ) const override;
 
-            void test() const;
+            void test(void) const;
     };
 }

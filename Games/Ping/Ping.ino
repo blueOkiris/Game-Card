@@ -3,7 +3,6 @@
  * Description: A pong clone for 1 and 2 players
  */
 
-#include <avr/pgmspace.h>
 #include <GameCardDisplay.hpp>
 #include <GameCardControls.hpp>
 #include "State.hpp"
