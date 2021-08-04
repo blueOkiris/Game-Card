@@ -13,12 +13,12 @@ const gamecard::Ssd1306 g_disp;
 const gamecard::ButtonController g_cont;
 GameState g_state;
 
-void setup() {
+void setup(void) {
     g_disp.init();
     g_cont.init();
 }
 
-void loop() {
+void loop(void) {
     switch(g_state.curr) {
         case GameState::StateName::Menu:
             g_state.reset();
