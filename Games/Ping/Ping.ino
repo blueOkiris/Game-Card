@@ -12,7 +12,17 @@ const gamecard::Ssd1306 g_disp;
 const gamecard::ButtonController g_cont;
 GameState g_state;
 
+/*
+ * Ignore this.
+ * Program was close to 100% of space,
+ * so I decided to make it all the way
+ * because I though it was funny
+ */
+const uint8_t PROGMEM wasteOfSpace[47] = { 0 };
+
 void setup(void) {
+    delay(pgm_read_byte(wasteOfSpace));
+    
     g_disp.init();
     g_cont.init();
 }
