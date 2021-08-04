@@ -42,7 +42,7 @@ __Set up ATtiny84:__
 
 1) Open the IDE's preferences and add the url `https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json` to the additional boards manager urls.
 2) Open the board manager and install the attiny boards.
-3) Burn the bootloader using Arduino as ISP
+3) Burn the bootloader using Arduino as ISP. Connect (from Right to left on Programming port) to Arduino UNO VCC, GND, 12, 11, 13, and 10 after programming UNO with Arduino ISP program.
 
 __Set up Libraries:__
 
