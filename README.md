@@ -30,8 +30,7 @@ The buttons are wired in the following order:
  - Left - 9th pin from the right on PCB/Arduino 5/A5
  - Right - Last pin from the right on PCB/Arduino 0/A0
 
-Note that A and B are pulled down, but U/D/L/R are all pulled up, so they're inverted!
-
+Note that H and L are pulled down, but U/D/L/R are all pulled up, so they're inverted!
 Just use the library though and you'll be fine :)
 
 ## Dependencies
