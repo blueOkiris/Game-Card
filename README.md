@@ -4,7 +4,7 @@
 
 A credit card sized portable game console utilizing buttons, multiple games, and an i2c display
 
-![Game Card Final Image](/docs/img/gc-final.png)
+![Game Card Final Image](/docs/img/game-card-final.jpg)
 
 ## More Links
  - [Info on Design](/docs/DESIGN.md)
