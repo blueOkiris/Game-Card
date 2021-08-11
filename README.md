@@ -6,7 +6,9 @@ A business card sized portable game console utilizing buttons, multiple games, a
 
 ![Game Card Final Image](/docs/img/game-card-final.jpg)
 
+<html>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qE-Pg2zxOUw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+ </html>
 
 ## More Links
  - [Info on Design](/docs/DESIGN.md)
