@@ -14,7 +14,7 @@ Currently there are three games developed for the Game Card:
 
 - Ping (1 and 2 player pong clone)
 - Snek (Snake clone)
-- Tiny RPG (a very small RPG)
+- In Progress: Tiny RPG (a very small RPG)
 
 ## More Links
  - [Info on Design](/docs/DESIGN.md)

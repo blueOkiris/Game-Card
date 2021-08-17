@@ -1,1 +1,12 @@
 .vscode/
+TinyWireM/
+*.zip
+*.tar.gz
+arduino-cli/
+
+games/*/GameCard*
+games/*/TinyWire*
+games/*/USI_*
+
+build/
+*.hex

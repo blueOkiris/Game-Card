@@ -1,0 +1,19 @@
+board_manager:
+  additional_urls: [ "https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json" ]
+daemon:
+  port: "50051"
+directories:
+  data: arduino-cli\data
+  downloads: arduino-cli\staging
+  user: .
+library:
+  enable_unsafe_install: false
+logging:
+  file: ""
+  format: text
+  level: info
+metrics:
+  addr: :9090
+  enabled: true
+sketch:
+  always_export_binaries: false
