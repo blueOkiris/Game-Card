@@ -12,14 +12,14 @@ using namespace gamecard;
 
 void Ssd1306::_command(const uint8_t cmd) const {
     TinyWireM.beginTransmission(SSD_I2C_ADDR);
-    TinyWireM.send(SSD_CTRL);
-    TinyWireM.send(cmd);
+    TinyWireM.write(SSD_CTRL);
+    TinyWireM.write(cmd);
     TinyWireM.endTransmission();
 }
 
 void Ssd1306::_command(const uint8_t *cmd, const uint8_t len) const {
     TinyWireM.beginTransmission(SSD_I2C_ADDR);
-    TinyWireM.send(cmd, len);
+    TinyWireM.write(cmd, len);
     TinyWireM.endTransmission();
 }
 
