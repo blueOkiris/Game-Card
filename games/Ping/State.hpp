@@ -11,7 +11,8 @@ struct GameState {
     
     bool twoPlayer, aiPlayerDown;
     bool p1Wins;
-    uint8_t playerHeight[2]; // Player 1 and 2 each have y
+    float playerHeight[2]; // Player 1 and 2 each have y
+    uint8_t lastAiTile;
     uint8_t playerScore[2]; // P1 & 2 each have score (up to 7)
     float ballPos[2]; // Unlike players, we want both x and y
     float ballVel[2];
@@ -27,6 +28,7 @@ struct GameState {
         p1Wins = true;
         aiPlayerDown = false;
         playerHeight[0] = playerHeight[1] = 3;
+        lastAiTile = 3;
         playerScore[0] = playerScore[1] = 0;
         ballPos[0] = SSD_SCREEN_WIDTH / 2 - 4;
         ballPos[1] = SSD_SCREEN_HEIGHT / 2 - 4;

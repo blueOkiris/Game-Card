@@ -5,22 +5,35 @@
  *  - Note: requires SoftwareWire library!
  */
 #include <Arduino.h>
-#include <SoftwareWire.h>
+#include <TinyWireM.h>
 #include <GameCardDisplay.hpp>
 
 using namespace gamecard;
 
 void Ssd1306::_command(const uint8_t cmd) const {
-    _wire.beginTransmission(SSD_I2C_ADDR);
-    _wire.write(SSD_CTRL);
-    _wire.write(cmd);
-    _wire.endTransmission();
+    TinyWireM.beginTransmission(SSD_I2C_ADDR);
+    TinyWireM.send(SSD_CTRL);
+    TinyWireM.send(cmd);
+    TinyWireM.endTransmission();
+}
+
+void Ssd1306::_command(const uint8_t *cmd, const uint8_t len) const {
+    TinyWireM.beginTransmission(SSD_I2C_ADDR);
+    TinyWireM.send(cmd, len);
+    TinyWireM.endTransmission();
+}
+
+void Ssd1306::_data(const uint8_t data) const {
+    TinyWireM.beginTransmission(SSD_I2C_ADDR);
+    TinyWireM.write(SSD_DATA);
+    TinyWireM.write(data);
+    TinyWireM.endTransmission();
 }
 
 void Ssd1306::init(void) const {
     // Initialize i2c
-    _wire = SoftwareWire(6, 4);
-    _wire.begin();
+    //TinyWireM = SoftwareWire(6, 4);
+    TinyWireM.begin();
     
     // Send correct commands to display to init
     _command(SSD_CMD_DISP_OFF);             // command 
@@ -60,18 +73,15 @@ void Ssd1306::fill(const bool isClear) const {
             SSD_CMD_SET_PAGE_ADDR, 0, (SSD_SCREEN_HEIGHT >> 3) - 1,
         SSD_CTRL, SSD_CMD_SET_COL_ADDR, 0, SSD_SCREEN_WIDTH - 1
     };
-    _wire.beginTransmission(SSD_I2C_ADDR);
+    TinyWireM.beginTransmission(SSD_I2C_ADDR);
     for(int i = 0; i < 8; i++) {
-        _wire.write(topLeftMove[i]);
+        TinyWireM.write(topLeftMove[i]);
     }
-    _wire.endTransmission();
+    TinyWireM.endTransmission();
     
     // Make everything black
     for(int i = 0; i < 1024; i++) {
-        _wire.beginTransmission(SSD_I2C_ADDR);
-        _wire.write(SSD_DATA);
-        _wire.write(color);
-        _wire.endTransmission();
+        _data(color);
     }
 }
 
@@ -87,18 +97,11 @@ void Ssd1306::putTile(
         static_cast<uint8_t>(120 - (tileX << 3)),
         static_cast<uint8_t>(127 - (tileX << 3))
     };
-    _wire.beginTransmission(SSD_I2C_ADDR);
-    for(int i = 0; i < 8; i++) {
-        _wire.write(positionCmd[i]);
-    }
-    _wire.endTransmission();
+    _command(positionCmd, 8);
     
-    // Draw the tile
+    // Draw the tile (reversed)
     for(int i = 7; i >= 0; i--) {
-        _wire.beginTransmission(SSD_I2C_ADDR);
-        _wire.write(SSD_DATA);
-        _wire.write(data[i]);
-        _wire.endTransmission();
+        _data(data[i]);
     }
 }
 
@@ -106,42 +109,42 @@ void Ssd1306::putOffsetTile(
         const uint8_t x, const uint8_t y,
         const uint8_t data[8],
         const uint8_t bgTiles[4][8]) const {
-    uint8_t topLeftX = x >> 3;
-    uint8_t topLeftY = (y >> 3) << 3;
+    const uint8_t topLeftX = x >> 3;
+    const uint8_t topLeftY = (y >> 3) << 3;
     
-    uint8_t offX = x - (topLeftX << 3);
-    uint8_t offY = y - topLeftY;
+    const uint8_t offX = x - (topLeftX << 3);
+    const uint8_t offY = y - topLeftY;
     
-    uint8_t quadTile[4][8];
+    uint8_t quadTiles[4][8];
     for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 8; j++) {
-            quadTile[i][j] = bgTiles[i][j];
+            quadTiles[i][j] = bgTiles[i][j];
             
             switch(i) {
                 case 0:
                     if(j >= offX) {
-                        quadTile[i][j] |=
+                        quadTiles[i][j] |=
                             data[7 - (j - offX)] << offY;
                     }
                     break;
                 
                 case 1:
                     if(j < offX) {
-                        quadTile[i][j] |=
+                        quadTiles[i][j] |=
                             data[offX - j - 1] << offY;
                     }
                     break;
                 
                 case 2:
                     if(j >= offX) {
-                        quadTile[i][j] |=
+                        quadTiles[i][j] |=
                             data[7 - (j - offX)] >> (8 - offY);
                     }
                     break;
                     
                 case 3:
                     if(j < offX) {
-                        quadTile[i][j] |=
+                        quadTiles[i][j] |=
                             data[offX - j - 1] >> (8 - offY);
                     }
                     break;
@@ -149,10 +152,10 @@ void Ssd1306::putOffsetTile(
         }
     }
     
-    putTile(quadTile[0], topLeftX, topLeftY >> 3);
-    putTile(quadTile[1], topLeftX + 1, topLeftY >> 3);
-    putTile(quadTile[2], topLeftX, (topLeftY >> 3) + 1);
-    putTile(quadTile[3], topLeftX + 1, (topLeftY >> 3) + 1);
+    putTile(quadTiles[0], topLeftX, topLeftY >> 3);
+    putTile(quadTiles[1], topLeftX + 1, topLeftY >> 3);
+    putTile(quadTiles[2], topLeftX, (topLeftY >> 3) + 1);
+    putTile(quadTiles[3], topLeftX + 1, (topLeftY >> 3) + 1);
 }
 
 void Ssd1306::test(void) const {

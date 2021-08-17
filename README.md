@@ -8,6 +8,14 @@ A business card sized portable game console utilizing buttons, multiple games, a
 
 [YouTube Video](https://www.youtube.com/watch?v=qE-Pg2zxOUw)
 
+## Game List
+
+Currently there are three games developed for the Game Card:
+
+- Ping (1 and 2 player pong clone)
+- Snek (Snake clone)
+- Tiny RPG (a very small RPG)
+
 ## More Links
  - [Info on Design](/docs/DESIGN.md)
  - [Info on Programming Cartridges](/docs/PROGRAMMING.md)
