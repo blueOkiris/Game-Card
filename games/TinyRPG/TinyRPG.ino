@@ -4,15 +4,17 @@
  */
 
 #include <GameCardDisplay.hpp>
-#include <GameCardControls.hpp>
-#include "State.hpp"
-#include "Sprites.hpp"
-
 const gamecard::Ssd1306 g_disp;
-const gamecard::ButtonController g_cont;
 
 void setup(void) {
-
+    g_disp.init();
+    g_disp.fill(false);
+    delay(1000);
+    g_disp.fill(true);
+    delay(1000);
+    while(1) {
+        g_disp.test();
+    }
 }
 
 void loop(void) {

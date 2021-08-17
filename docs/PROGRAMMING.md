@@ -36,7 +36,7 @@ This is how to set up your dev environment to be able to get these programs to y
 
 ## Set up Libraries:
 
-7) Download the SoftwareWire library from the library manager
+7) Download the TinyWireM library from the library manager
 8) Copy the folders in the repo's libraries/ subdirectory to your Arduino libraries folder (Default is Documents/Arduino/libraries)
 
 ## Program Game
