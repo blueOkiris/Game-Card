@@ -18,6 +18,8 @@ Linux users simply use your package manager to install make. On Ubuntu/Debian, t
 
 After that, go to the official arduino page and install the Arduino IDE.
 
+NOTE: If you're on Linux, you also need to change lines 6 and 7 of arduino-cli.yaml to use / instead of \\!
+
 ## Setup UNO
 
 Open up the Arduino IDE and find the example "ArduinoISP" program in the Arduino IDE, select the UNO from the menu (noting the PORT for later), and program the UNO with the Arduino ISP program.
