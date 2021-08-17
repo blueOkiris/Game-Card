@@ -38,7 +38,7 @@ From Right to left on Programming port the connections are 5V, GND, 12, 11, 13, 
 
 With everything set up, first burn the bootloader:
  - Linux: `make burn-bootloader PORT=#####`
- - Linux: `make burn-bootloader PORT=#####`
+ - Windows: `mingw32-make burn-bootloader PORT=#####`
 
 Replace the pound signs after `PORT=` with the UNO's port from earlier.
 
@@ -47,7 +47,7 @@ Replace the pound signs after `PORT=` with the UNO's port from earlier.
 Then program the game!
 
  - Linux: `make PORT=##### GAME=#####`
- - Windows: `make PORT=##### GAME=#####`
+ - Windows: `mingw32-make PORT=##### GAME=#####`
 
 Once again, replace the pound signs after `PORT=` with the UNO's port from earlier, but also replace the pound signs after `GAME=` with the name of the game you'd like to program be that Snek, Pong, or otherwise.
 
