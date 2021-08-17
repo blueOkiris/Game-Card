@@ -49,6 +49,6 @@ Then program the game!
  - Linux: `make PORT=##### GAME=#####`
  - Windows: `mingw32-make PORT=##### GAME=#####`
 
-Once again, replace the pound signs after `PORT=` with the UNO's port from earlier, but also replace the pound signs after `GAME=` with the name of the game you'd like to program be that Snek, Pong, or otherwise.
+Once again, replace the pound signs after `PORT=` with the UNO's port from earlier, but also replace the pound signs after `GAME=` with the name of the game you'd like to program be that Snek, Ping, or otherwise.
 
 And you're done!
