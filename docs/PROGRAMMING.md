@@ -14,7 +14,7 @@ If you're on windows, install MinGW from [here](http://sourceforge.net/projects/
 
 That will give you access to the command `mingw32-make` which is an equivalent to `make` on Linux.
 
-Linux users simply use your package manager to install make. On Ubuntu/Debian, the package is within "build-essential."
+Linux users, simply use your package manager to install make. On Ubuntu/Debian, the package is within "build-essential."
 
 After that, go to the official arduino page and install the Arduino IDE.
 
