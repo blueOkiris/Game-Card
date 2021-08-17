@@ -12,17 +12,7 @@ const gamecard::Ssd1306 g_disp;
 const gamecard::ButtonController g_cont;
 GameState g_state;
 
-/*
- * Ignore this.
- * Program was close to 100% of space,
- * so I decided to make it all the way
- * because I though it was funny
- */
-const uint8_t PROGMEM wasteOfSpace[47] = { 0 };
-
 void setup(void) {
-    delay(pgm_read_byte(wasteOfSpace));
-    
     g_disp.init();
     g_cont.init();
 }
@@ -59,6 +49,15 @@ void loop(void) {
             clearBall();
             moveBallAndScore();
             drawBall();
+
+            /*
+             * Switching to TinyWireM
+             * didn't just save memory
+             * it drastically improved draw speeds
+             * so we have to delay now
+             * (This is a good thing)
+             */
+            delay(5);
             break;
 
         case GameState::StateName::End:
@@ -73,7 +72,7 @@ void loop(void) {
 }
 
 bool updateMoveDirection(
-        bool *pressedRef, uint8_t *heightRef, gamecard::Input inp,
+        bool *pressedRef, float *heightRef, gamecard::Input inp,
         uint8_t drawX, bool isUp) {
     if(!(*pressedRef) && g_cont.isInputPressed(inp)
             && ((isUp && *heightRef > 0) || (!isUp && *heightRef < 7))) {
@@ -108,22 +107,30 @@ void movePaddles() {
             gamecard::Input::Low, 15, false
         );
     } else { // AI
-        g_disp.putTile(g_backSprs[0], 15, g_state.playerHeight[1]);
-        if(!g_state.aiPlayerDown && g_state.playerHeight[1] == 0) {
-            g_state.playerHeight[1]++;
+        if(!g_state.aiPlayerDown && g_state.playerHeight[1] < 0.5) {
+            g_state.playerHeight[1] += 0.1;
             g_state.aiPlayerDown = true;
-        } else if(g_state.aiPlayerDown && g_state.playerHeight[1] == 7) {
-            g_state.playerHeight[1]--;
+        } else if(g_state.aiPlayerDown && g_state.playerHeight[1] > 6.5) {
+            g_state.playerHeight[1] -= 0.1;
             g_state.aiPlayerDown = false;
         } else {
-            g_state.playerHeight[1] += g_state.aiPlayerDown ? 1 : -1;
+            g_state.playerHeight[1] += g_state.aiPlayerDown ? 0.4 : -0.4;
+        }
+        if(g_state.lastAiTile
+                != static_cast<uint8_t>(g_state.playerHeight[1])) {
+            g_disp.putTile(g_backSprs[0], 15, g_state.lastAiTile);
+            g_state.lastAiTile = static_cast<uint8_t>(g_state.playerHeight[1]);
         }
     }
 }
 
 void drawPaddles(void) {
-    g_disp.putTile(g_paddleSpr, 0, g_state.playerHeight[0]);
-    g_disp.putTile(g_paddleSpr, 15, g_state.playerHeight[1]);
+    g_disp.putTile(
+        g_paddleSpr, 0, static_cast<uint8_t>(g_state.playerHeight[0])
+    );
+    g_disp.putTile(
+        g_paddleSpr, 15, static_cast<uint8_t>(g_state.playerHeight[1])
+    );
 }
 
 void drawWinner(void) {
@@ -156,14 +163,18 @@ void moveBallAndScore(void) {
     g_state.ballPos[1] += g_state.ballVel[1];
     
     if(g_state.ballPos[0] < 8
-            && g_state.ballPos[1] < g_state.playerHeight[0] * 8 + 8
-            && g_state.ballPos[1] + 8 > g_state.playerHeight[0] * 8){
+            && g_state.ballPos[1]
+                < static_cast<uint8_t>(g_state.playerHeight[0]) * 8 + 8
+            && g_state.ballPos[1] + 8
+                > static_cast<uint8_t>(g_state.playerHeight[0]) * 8) {
         g_state.ballVel[0] = g_state.baseBallSpeed
             + (random(0, g_state.maxBallExtra * 10) / 10.0f);
         g_state.ballPos[0] = 9;
     } else if(g_state.ballPos[0] > 111
-            && g_state.ballPos[1] < g_state.playerHeight[1] * 8 + 8
-            && g_state.ballPos[1] + 8 > g_state.playerHeight[1] * 8) {
+            && g_state.ballPos[1]
+                < static_cast<uint8_t>(g_state.playerHeight[1]) * 8 + 8
+            && g_state.ballPos[1] + 8
+                > static_cast<uint8_t>(g_state.playerHeight[1]) * 8) {
         g_state.ballVel[0] = -g_state.baseBallSpeed
             + (random(0, g_state.maxBallExtra * 10) / 10.0f);
         g_state.ballPos[0] = 110;
