@@ -92,10 +92,30 @@ $(GAME).ino.hex : $(ARD_CLI_FNAME) $(LIB_FILES) libraries/$(I2C_LIB_NAME) $(wild
 	-cp $(BUILD_PATH)/$@ .
 	-cmd /K "copy $(BUILD_PATH)\$@ . & exit"
 
-# Upload a file
+# Build Test
+$(TEST).ino.hex : $(ARD_CLI_FNAME) $(LIB_FILES) libraries/$(I2C_LIB_NAME) $(wildcard libraries/$(I2C_LIB_NAME)/*.h) $(wildcard libraries/$(I2C_LIB_NAME)/*.cpp) $(wilcard tests/$(TEST)/*)
+	-mkdir $(BUILD_PATH)
+	$(ARD_CLI_FNAME) compile \
+		--config-file=$(ARD_CLI_CONF_FILE) \
+		--fqbn $(TINY_BOARD_FQBN) \
+		--build-path $(BUILD_PATH) \
+		--libraries ./libraries,. \
+		tests/$(TEST)
+	-cp $(BUILD_PATH)/$@ .
+	-cmd /K "copy $(BUILD_PATH)\$@ . & exit"
+
+# Upload a game
 # Takes paramaters PORT and GAME
 .PHONY : upload
 upload : $(GAME).ino.hex
+	$(ARD_CLI_FNAME) upload \
+		--fqbn $(TINY_BOARD_FQBN) \
+		-P $(ARD_CLI_PROG) -p $(PORT) -i $<
+		
+# Upload a test file
+# Takes paramaters PORT and TEST
+.PHONY : upload-test
+upload-test : $(TEST).ino.hex
 	$(ARD_CLI_FNAME) upload \
 		--fqbn $(TINY_BOARD_FQBN) \
 		-P $(ARD_CLI_PROG) -p $(PORT) -i $<
