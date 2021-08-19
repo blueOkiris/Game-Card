@@ -39,7 +39,6 @@
 #define SSD_RESET               15
 
 // I2C settings
-#define I2C_PORT                i2c0
 #define I2C_DATA_PIN            4
 #define I2C_CLOCK_PIN           5
 #define I2C_CLOCK_SPD           1000000
