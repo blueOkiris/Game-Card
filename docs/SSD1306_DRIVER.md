@@ -36,3 +36,9 @@ Things to note:
 * D7:3 are tied to GND while D2:1 are tied to SDA.
 * E and CS# are both low
 * Reset is high bc we don't want it to reset.
+
+## Driver Circuit
+
+Adafruit provides a driver circuit that I think I can use as a reference for my own design:
+
+![adafruit i2c display circuit](/docs/img/adafruit-ssd1306-driver.png)
