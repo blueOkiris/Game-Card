@@ -42,3 +42,14 @@ Things to note:
 Adafruit provides a driver circuit that I think I can use as a reference for my own design:
 
 ![adafruit i2c display circuit](/docs/img/adafruit-ssd1306-driver.png)
+
+It's... okay.
+I found a simpler one though:
+
+![simpler i2c ssd1306](/docs/img/simpler-ssd1306-driver.png)
+
+But I'm not certain it's actually setting everything up correctly.
+
+Got it from [here](https://www.olimex.com/Products/Modules/LCD/MOD-OLED-128x64/open-source-hardware)
+
+
